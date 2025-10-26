@@ -18,8 +18,6 @@
     .tag{font-size:12px;color:#071018;background:var(--brand);padding:3px 8px;border-radius:999px;font-weight:600; animation:pulse 3s ease-in-out infinite; box-shadow:0 0 10px rgba(110,231,255,0.3)}
     @keyframes pulse{0%, 100%{box-shadow:0 0 10px rgba(110,231,255,0.3)}50%{box-shadow:0 0 20px rgba(110,231,255,0.5)}}
     .muted{color:var(--muted);font-size:12px}
-    /* Make Open Monitor stand out */
-    /* Revert monitor button to ghost style */
     #monitorBtn{ text-align:center; }
 
     .hero{display:grid;place-items:center;min-height:70vh;width:100%}
@@ -29,11 +27,8 @@
     .title h2{margin:0;font-size:18px;color:#f2f6ff; text-shadow:0 2px 4px rgba(0,0,0,0.3)}
     @keyframes float{0%, 100%{transform:translateY(0px)}50%{transform:translateY(-3px)}}
     
-    /* Info button styling */
-    /* Info button now uses .ghost style for uniformity with header buttons */
     .info-btn{ all: unset; }
     
-    /* Info modal content styling */
     .info-content{
       max-height: 70vh;
       overflow-y: auto;
@@ -65,7 +60,6 @@
       color: #6ee7ff;
     }
 
-    /* Basket */
     .basket{position:relative;padding:48px 28px 32px;border-radius:28px;max-width:740px;margin:0 auto; pointer-events: none;}
     .basket .inner{position:relative; z-index:5; pointer-events: auto;}
     .basket .handle{position:absolute; left:50%; top:-100px; width:420px; height:180px; transform:translateX(-50%); border:16px solid #7f532c; border-bottom:none; border-radius:420px 420px 0 0; background: radial-gradient(120% 80% at 50% 100%, rgba(0,0,0,.45), transparent 60%); box-shadow: inset 0 -14px 20px rgba(0,0,0,.35), 0 16px 26px rgba(0,0,0,.35); z-index:1}
@@ -97,7 +91,6 @@
       z-index: 10 !important;
     }
     
-    /* Dynamic layout adjustments for different fruit counts */
     .board:has(.fruit:nth-child(1):last-child) { 
       justify-content: center; 
       gap: 0;
@@ -123,7 +116,6 @@
       gap: 20px; 
     }
     
-    /* Ensure fruits are properly sized and spaced */
     .board .fruit{
       width:128px;height:128px;
       flex-shrink: 0;
@@ -178,13 +170,11 @@
     .fruit::before{content:""; position:absolute; left:20%; right:20%; bottom:10px; height:14px; border-radius:999px; background:radial-gradient(70% 120% at 50% 50%, rgba(0,0,0,.45), rgba(0,0,0,0)); filter:blur(.5px)}
     .fruit.out{opacity:.35; filter:grayscale(1) brightness(.9); pointer-events:none}
 
-    /* -------- Responsive: phones -------- */
     @media (max-width: 600px){
       .wrap{padding:14px}
       h1{font-size:18px}
       header .wrap{gap:10px}
       header .wrap > div:last-child{display:flex;flex-wrap:wrap;gap:8px}
-      /* Center Open Monitor and make it span full width on phones */
       #monitorBtn{flex:1 1 100%; text-align:center}
       .hero-card{padding:14px}
       .title h2{font-size:16px}
@@ -203,17 +193,14 @@
       dialog .modal h3{font-size:16px}
       dialog .modal label{font-size:12px}
       dialog .modal input, dialog .modal select, dialog .modal button{font-size:14px}
-      /* Slimmer, smoother handle on phones */
       .basket .handle{top:-48px; width:330px; height:160px; border-width:12px; transform:translateX(-50%) scale(.92); border-color:#8a5d33; box-shadow: inset 0 -10px 16px rgba(0,0,0,.3), 0 10px 20px rgba(0,0,0,.28)}
       .basket .handle:after{inset:8px; border-width:8px; border-color:#b17a45; filter:brightness(1.03)}
       .basket .rim,.basket .topBar{transform:scale(.9);}
       .basket .inner{padding:12px; overflow:hidden}
-      /* Keep full basket visible, just scale subtly */
       .basket{transform:scale(.9); transform-origin: top center}
       .basket .inner{border:1px solid rgba(110,231,255,0.12); box-shadow: inset 0 8px 16px rgba(0,0,0,.25)}
       .board{padding:18px; gap:18px; min-height:auto; max-width:360px; margin:0 auto;
         background:rgba(15,20,30,0.6); border:1px solid rgba(110,231,255,0.12); box-shadow:0 6px 18px rgba(0,0,0,.25);
-        /* switch to grid on phones for perfect centering */
         display:grid; grid-template-columns:repeat(2, auto); place-items:center; place-content:center}
       .board .fruit{width:96px;height:96px; justify-self:center; align-self:center}
       .board .fruit[data-size="lg"]{width:108px;height:108px}
@@ -232,7 +219,6 @@
       .admin-fruit, .extra-task-item{min-width:0}
     }
 
-    /* Extra-compact phones */
     @media (max-width: 420px){
       .wrap{padding:12px}
       h1{font-size:16px}
@@ -242,14 +228,12 @@
       .title .muted{font-size:10px}
       .controls input[type="text"], .controls select, .controls button{flex:1 1 100%}
       .rows .row .right button{flex:1 1 100%}
-      /* Show full basket on very small phones, scaled */
       .basket{margin:0; transform:scale(.85); transform-origin: top center}
       .basket .handle{top:-40px; width:300px; height:140px; border-width:10px}
       .basket .handle:after{inset:7px; border-width:7px}
       .basket .inner{padding:10px; overflow:hidden}
       .board{padding:14px; gap:16px; min-height:auto; max-width:300px; margin:0 auto;
         background:rgba(15,20,30,0.55); border:1px solid rgba(110,231,255,0.12); box-shadow:0 4px 14px rgba(0,0,0,.22)}
-      /* keep grid layout on extra-compact phones */
       .board{display:grid; grid-template-columns:repeat(2, auto); place-items:center; place-content:center}
       .board .fruit{width:88px;height:88px; justify-self:center; align-self:center}
       .board .fruit[data-size="lg"]{width:92px;height:92px}
@@ -270,14 +254,12 @@
     .fruit .return-btn{position:absolute; top:8px; left:8px; background:#1b2537; border:1px solid #2a3650; color:#d7e3ff; font-size:12px; padding:4px 6px; border-radius:999px; cursor:pointer; opacity:0.8; transition:opacity 0.2s ease}
     .fruit .return-btn:hover{opacity:1; background:#2a3650}
     
-    /* Magical return effect styles */
     .fruit.returning{animation:fadeOut 0.8s ease-in-out forwards; pointer-events:none}
     @keyframes fadeOut{
       0%{opacity:1; transform:scale(1)}
       100%{opacity:0; transform:scale(0.8)}
     }
     
-    /* Admin fruit visual indicator */
     .fruit.admin-fruit{
       border: 3px solid rgba(255,215,0,0.7) !important;
       background: linear-gradient(135deg, #4a5a7b 0%, #3a4a6b 50%, #2a3450 100%) !important;
@@ -356,7 +338,6 @@
     .iconBtn{all:unset; width:38px; height:38px; display:inline-grid; place-items:center; border:1px solid #253049; border-radius:10px; background:#0f1622; cursor:pointer}
     .iconBtn:hover{box-shadow:var(--ring)}
     
-    /* Password input styling for consistency */
     #adminPwd{width:200px; height:38px; padding:10px 12px; border-radius:10px; border:1px solid #243047; background:#0c1220; color:#eaf1ff; font-size:14px; box-sizing:border-box}
     #togglePwd{width:38px; height:38px; display:inline-grid; place-items:center; border:1px solid #253049; border-radius:10px; background:#0f1622; cursor:pointer; font-size:16px; flex-shrink:0}
     #adminLoginBtn{height:38px; padding:10px 16px; border-radius:10px; border:1px solid #1d3a46; background:#0f1a20; color:#eaf1ff; cursor:pointer; font-size:14px; flex-shrink:0}
@@ -372,7 +353,6 @@
     .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .modal .actions{margin-top:10px}
 
-    /* Admin specific styles */
     .admin-section{margin:16px 0; padding:12px; border:1px solid #2a3a56; border-radius:12px; background:rgba(15,22,34,.6)}
     .admin-section h4{margin:0 0 12px 0; color:#6ee7ff; font-size:14px}
     .admin-fruits-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
@@ -467,7 +447,6 @@
     </section>
   </main>
 
-  <!-- Assign modal -->
   <dialog id="modal">
     <div class="modal">
       <h3 id="modalTitle">Assign Task</h3>
@@ -523,7 +502,6 @@
     </div>
   </dialog>
 
-  <!-- Admin modal -->
   <dialog id="adminDialog">
     <div class="modal">
       <h3>Admin Mode</h3>
@@ -546,14 +524,12 @@
           <button id="adminClose" class="primary">Close</button>
         </div>
         
-        <!-- Extra Tasks Section -->
         <div class="admin-section">
           <h4>📋 Extra Tasks</h4>
           <p class="admin-description">Extra fruits available for task assignment (admin only):</p>
           <div class="extra-tasks-grid" id="extraTasksGrid"></div>
         </div>
 
-        <!-- Enhanced Activity Log -->
         <div class="admin-section">
           <h4>📊 Activity Overview</h4>
           <div class="activity-stats" id="activityStats"></div>
@@ -566,7 +542,6 @@
           </div>
         </div>
 
-        <!-- Task Management -->
         <div class="admin-section">
           <h4>⚙️ Task Management</h4>
           <div class="admin-task-controls">
@@ -587,7 +562,6 @@
     </div>
   </dialog>
 
-  <!-- Info Modal -->
   <dialog id="infoDialog">
     <div class="modal">
       <h3>🍎 Magnet Tasks - Complete Guide</h3>
@@ -690,7 +664,6 @@
   <audio id="alarmAudio"></audio>
 
   <script>
-  // ===== Data =====
   let fruits = [
     { id:'pineapple', emoji:'🍍', name:'Pineapple', size:'lg', preset:'High' },
     { id:'orange', emoji:'🍊', name:'Orange',    size:'md', preset:'Medium' },
@@ -710,28 +683,23 @@
 
   const ce = (t)=>document.createElement(t);
 
-  // Returns true if the given fruit currently has an active (not done) task
   function fruitActive(fid){
     return tasks.some(t => t.fruitId === fid && t.status !== 'done');
   }
   const bc = ('BroadcastChannel' in window) ? new BroadcastChannel('magnet') : null;
 
-  // Test function for clicks
   function testClick() {
     alert('Test click works! Modal should open now...');
     openAssignModal(fruits[0]); // Test with pineapple
   }
   
-  // Make testClick available globally
   window.testClick = testClick;
 
   (document.readyState === 'loading') ? document.addEventListener('DOMContentLoaded', init) : init();
 
   function init(){
-    // KILL ANY PERSISTENT ALARMS IMMEDIATELY
     alarmingTaskIds.clear();
     
-    // Clear any stored alarm state
     try {
       localStorage.removeItem('mag_alarm_state');
       localStorage.removeItem('mag_alarming_tasks');
@@ -744,7 +712,6 @@
     searchEl = document.getElementById('search');
     filterPrioEl = document.getElementById('filterPrio');
 
-    // Clear any corrupted localStorage data
     try {
       localStorage.removeItem('mag_fruits');
       localStorage.removeItem('mag_admin_fruits');
@@ -753,7 +720,6 @@
       console.log('Could not clear localStorage:', e);
     }
     
-    // Force reset fruits to defaults
     fruits = [
       { id:'pineapple', emoji:'🍍', name:'Pineapple', size:'lg', preset:'High' },
       { id:'orange', emoji:'🍊', name:'Orange',    size:'md', preset:'Medium' },
@@ -768,7 +734,6 @@
     wireHeader();
     addLog('🧭 <b>Prototype loaded.</b> Pick a fruit to assign a task.');
     
-    // Force render fruits if board is empty
     setTimeout(() => {
       console.log('Checking board state...');
       console.log('Board element:', boardEl);
@@ -785,7 +750,6 @@
           card.style.zIndex = '20';
           card.innerHTML = `<div class="emoji">${f.emoji}</div><div class="name">${f.name}</div>`;
           
-          // Simple click handler
           card.onclick = function() {
             openAssignModal(f);
           };
@@ -797,7 +761,6 @@
       }
     }, 100);
     
-    // Additional fallback after longer delay
     setTimeout(() => {
       if (boardEl && boardEl.children.length === 0) {
         console.log('Second attempt - board still empty, forcing render...');
@@ -824,7 +787,6 @@
   }
 
   function ensureAdminFruitSizes() {
-    // Ensure only admin fruits on main screen have medium size until priority is set
     fruits.forEach(fruit => {
       if(fruit.adminOnly && !fruit.prioritySet) {
         fruit.size = 'md'; // Set to medium size until priority is assigned
@@ -833,7 +795,6 @@
   }
 
   function adjustBasketLayout(container, fruitCount){
-    // Responsive grid: 2 columns on small screens, 3 for 5+ fruits
     const isPhone = window.matchMedia('(max-width: 600px)').matches;
     if(isPhone){
       container.style.display = 'grid';
@@ -841,14 +802,12 @@
       container.style.gridTemplateColumns = `repeat(${cols}, auto)`;
       container.style.placeItems = 'center';
       container.style.placeContent = 'center';
-      // Dynamic board height to fit rows
       const rows = Math.ceil(fruitCount / cols);
       const baseHeight = 260; // base for 1-2 fruits
       const perRow = 150;     // extra per additional row
       container.style.minHeight = `${baseHeight + Math.max(0, rows-1)*perRow}px`;
       container.style.gap = fruitCount <= 2 ? '18px' : '16px';
     } else {
-      // Desktop uses flex centering
       container.style.display = 'flex';
       container.style.flexWrap = 'wrap';
       container.style.justifyContent = 'center';
@@ -860,16 +819,12 @@
   }
 
   function magicalReturnFruit(fruitId, cardElement){
-    // Start the magical animation
     cardElement.classList.add('returning');
     
-    // Create magical particles effect
     createMagicalParticles(cardElement);
     
-    // Play magical sound (if audio context is available)
     playMagicalSound();
     
-    // Wait for animation to complete, then return fruit
     setTimeout(() => {
       returnFruitToAdmin(fruitId);
     }, 800); // Match animation duration
@@ -880,7 +835,6 @@
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
     
-    // Create 8 magical particles
     for(let i = 0; i < 8; i++) {
       const particle = document.createElement('div');
       particle.style.cssText = `
@@ -897,7 +851,6 @@
         animation-delay: ${i * 0.1}s;
       `;
       
-      // Add particle animation
       const style = document.createElement('style');
       style.textContent = `
         @keyframes particleFloat {
@@ -922,7 +875,6 @@
       
       document.body.appendChild(particle);
       
-      // Remove particle after animation
       setTimeout(() => {
         particle.remove();
         style.remove();
@@ -948,7 +900,6 @@
       oscillator.start(audioCtx.currentTime);
       oscillator.stop(audioCtx.currentTime + 0.5);
     } catch(e) {
-      // Audio not available, continue silently
     }
   }
 
@@ -957,22 +908,17 @@
     if(fruitIndex !== -1) {
       const fruit = fruits[fruitIndex];
       
-      // Stop any alarms for tasks associated with this fruit
       const activeTasks = tasks.filter(t => t.fruitId === fruitId && t.status !== 'done');
       activeTasks.forEach(task => {
         stopAlarm(task.id);
-        // Mark the task as done since the fruit is being returned
         task.status = 'done';
         task.completedBy = 'Returned to Admin';
       });
       
-      // Additional cleanup to ensure no alarms persist
       try {
-        // Clear any stored alarm state for this fruit
         localStorage.removeItem(`mag_alarm_${fruitId}`);
       } catch(e) {}
       
-      // Restore original admin fruit properties based on fruit type
       if(fruit.id === 'apple') {
         fruit.preset = 'High';
         fruit.size = 'lg';
@@ -985,11 +931,9 @@
       }
       fruit.prioritySet = false; // Reset priority flag
       
-      // Move fruit back to admin fruits
       fruits.splice(fruitIndex, 1);
       adminFruits.push(fruit);
       
-      // Re-render both sections
       renderBoard(boardEl);
       renderExtraTasks();
       persist();
@@ -1004,7 +948,6 @@
     container.innerHTML = '';
     let i=0;
     
-    // Show only main fruits (admin fruits are moved here when clicked)
     fruits.forEach(f=>{
       const card = ce('div');
       card.className = 'fruit';
@@ -1012,7 +955,6 @@
       card.dataset.size = f.size;
       card.style.zIndex = String(10+i);
       
-      // Check if this fruit was originally an admin fruit
       const isAdminFruit = f.adminOnly;
       
       card.innerHTML = `
@@ -1025,7 +967,6 @@
       
       if(!fruitActive(f.id)) {
         if(isAdminFruit) {
-          // Add admin fruit visual indicator and double-click functionality
           card.classList.add('returnable', 'admin-fruit');
           card.title = `Double-click ${f.name} to return to admin panel 🔙`;
           
@@ -1036,19 +977,16 @@
             clickCount++;
             if(clickCount === 1) {
               clickTimer = setTimeout(() => {
-                // Single click - assign task
                 openAssignModal(f);
                 clickCount = 0;
               }, 300);
             } else if(clickCount === 2) {
-              // Double click - return to admin
               clearTimeout(clickTimer);
               clickCount = 0;
               magicalReturnFruit(f.id, card);
             }
           });
         } else {
-          // For regular fruits, just assign
           card.addEventListener('click', ()=>openAssignModal(f));
         }
       }
@@ -1057,7 +995,6 @@
       i++;
     });
     
-    // Adjust layout based on number of fruits
     adjustBasketLayout(container, fruits.length);
   }
 
@@ -1082,18 +1019,15 @@
     if(mUser){ mUser.value = localStorage.getItem('magnet_user') || ''; }
     mFruit.value = `${f.emoji} ${f.name}`;
     
-    // Check if this is a main fruit (has preset) or admin fruit
     const isMainFruit = f.preset && !f.adminOnly;
     
     if(isMainFruit) {
-      // For main fruits, show priority as read-only text
       mPriority.style.display = 'none';
       const priorityLabel = mPriority.previousElementSibling;
       priorityLabel.innerHTML = `Priority: <strong>${f.preset}</strong>`;
       priorityLabel.style.color = '#6ee7ff';
       priorityLabel.style.fontWeight = 'bold';
     } else {
-      // For admin fruits, show dropdown
       mPriority.style.display = 'block';
       const priorityLabel = mPriority.previousElementSibling;
       priorityLabel.innerHTML = 'Priority (preset)';
@@ -1104,8 +1038,6 @@
     
     mTask.value=''; mDate.value=''; mTime.value=''; mDueIn.value='';
     const today = new Date(); const yyyy=today.getFullYear(); const mm=String(today.getMonth()+1).padStart(2,'0'); const dd=String(today.getDate()).padStart(2,'0');
-    // Remove date restriction to allow any date
-    // if(mDate){ mDate.min = `${yyyy}-${mm}-${dd}`; }
     if(mTime){ mTime.step = 60; }
     
     modal.showModal();
@@ -1128,7 +1060,6 @@
       return new Date(Date.now() + mins*60*1000).toISOString();
     }
     if(mDate.value && mTime.value){
-      // Create date in local timezone to avoid timezone conversion issues
       const [year, month, day] = mDate.value.split('-').map(Number);
       const [hours, minutes] = mTime.value.split(':').map(Number);
       const localDate = new Date(year, month - 1, day, hours, minutes, 0);
@@ -1167,13 +1098,10 @@
       if(!mDueIn.value && !(mDate.value && mTime.value)){ notify('Please set a due date & time, or choose "due in".'); return; }
       if(!mDueIn.value){
         if(!isValidDateStr(mDate.value) || !isValidTimeStr(mTime.value)) { notify('Please enter a real date & time.'); return; }
-        // Create date in local timezone to avoid timezone conversion issues
         const [year, month, day] = mDate.value.split('-').map(Number);
         const [hours, minutes] = mTime.value.split(':').map(Number);
         const tmp = new Date(year, month - 1, day, hours, minutes, 0);
         if(isNaN(tmp.getTime())) { notify('Invalid date/time.'); return; }
-        // Allow any date - removed future date restriction
-        // if(tmp.getTime() < Date.now()) { notify('Due time must be in the future.'); return; }
       }
 
       const dueISO = computeDue();
@@ -1181,11 +1109,9 @@
       const assignee = (mUser?.value || localStorage.getItem('magnet_user') || '').trim() || 'Someone';
       if(mUser && mUser.value.trim()){ localStorage.setItem('magnet_user', mUser.value.trim()); }
       
-      // Get priority - for main fruits use preset, for admin fruits use dropdown value
       const isMainFruit = currentFruit?.preset && !currentFruit?.adminOnly;
       const prio = isMainFruit ? currentFruit.preset : (mPriority.value || null);
       
-      // Update fruit size based on priority for admin fruits (only when priority is explicitly set)
       if(!isMainFruit && prio && prio !== '' && prio !== 'none') {
         if(prio === 'High') currentFruit.size = 'lg';
         else if(prio === 'Medium') currentFruit.size = 'md';
@@ -1223,7 +1149,6 @@
         return matchesText && matchesPrio;
       })
       .sort((a,b)=>{
-        // First sort by priority (High > Medium > Low > none)
         const priorityOrder = { 'High': 3, 'Medium': 2, 'Low': 1, '': 0 };
         const aPrio = priorityOrder[a.prio] || 0;
         const bPrio = priorityOrder[b.prio] || 0;
@@ -1232,7 +1157,6 @@
           return bPrio - aPrio; // Higher priority first
         }
         
-        // If same priority, sort by due date
         return new Date(a.due) - new Date(b.due);
       })
       .forEach(t=>{
@@ -1249,7 +1173,6 @@
         const actions = ce('div'); actions.className='actions';
         const btnDone = ce('button'); btnDone.className='primary'; btnDone.innerHTML='Return to Basket ✅'; btnDone.addEventListener('click', ()=>completeTask(t.id));
         
-        // Only show snooze and cancel buttons in admin mode
         if(isAdminMode) {
           const btnSnooze = ce('button'); btnSnooze.title='Snooze 5 minutes'; btnSnooze.innerText='Snooze 5m'; btnSnooze.addEventListener('click', ()=>snoozeTask(t.id, 5));
           const btnSkip = ce('button'); btnSkip.title='Cancel task'; btnSkip.innerText='Cancel'; btnSkip.addEventListener('click', ()=>cancelTask(t.id));
@@ -1318,7 +1241,6 @@
   function openAdmin(){ 
     adminDlg.showModal(); 
     refreshForceSelect(); 
-    // Reset admin panel to welcome state every time
     adminLogin.style.display='block'; 
     adminPanel.style.display='none';
   }
@@ -1328,7 +1250,6 @@
     if(!grid) return;
     grid.innerHTML = '';
     
-    // Show only admin fruits as extra tasks
     adminFruits.forEach(fruit => {
       const isActive = fruitActive(fruit.id);
       const taskEl = ce('div');
@@ -1342,19 +1263,15 @@
       
       if(!isActive) {
         taskEl.addEventListener('click', () => {
-          // Show confirmation popup
           if(confirm(`Add ${fruit.name} to the main page?`)) {
-            // Move fruit from adminFruits to fruits
             const fruitIndex = adminFruits.findIndex(f => f.id === fruit.id);
             if(fruitIndex !== -1) {
               const movedFruit = adminFruits.splice(fruitIndex, 1)[0];
-              // Remove preset priority and set to normal size until priority is assigned
               movedFruit.preset = '';
               movedFruit.size = 'md'; // Set to medium size until priority is assigned
               movedFruit.prioritySet = false; // Flag to track if priority was explicitly set
               fruits.push(movedFruit);
               
-              // Re-render both sections
               renderExtraTasks();
               renderBoard(boardEl);
               persist();
@@ -1407,7 +1324,6 @@
     if(!adminLogEl) return;
     adminLogEl.innerHTML = '';
     
-    // Show recent log items
     const logItems = Array.from(document.querySelectorAll('.logItem')).slice(0, 10);
     logItems.forEach(item => {
       const clone = item.cloneNode(true);
@@ -1420,7 +1336,6 @@
     renderTasks(); // Re-render to hide admin buttons
   });
 
-  // Info button and modal
   const infoBtn = document.getElementById('infoBtn');
   const infoDialog = document.getElementById('infoDialog');
   const infoClose = document.getElementById('infoClose');
@@ -1441,16 +1356,13 @@
     adminLogin.style.display='none'; 
     adminPanel.style.display='grid';
     isAdminMode = true;
-    // Render admin features
     renderExtraTasks();
     renderActivityStats();
     renderAdminActivityLog();
-    // Re-render tasks to show admin buttons
     renderTasks();
     notify('Welcome to Admin Mode! 🎯');
   });
 
-  // Toggle activity log visibility
   document.getElementById('toggleActivityLog').addEventListener('click', ()=>{
     const logDiv = document.getElementById('adminActivityLog');
     const toggleBtn = document.getElementById('toggleActivityLog');
@@ -1463,7 +1375,6 @@
     }
   });
 
-  // Refresh stats
   document.getElementById('refreshStats').addEventListener('click', ()=>{
     renderActivityStats();
     renderExtraTasks();
@@ -1471,7 +1382,6 @@
     notify('Stats refreshed');
   });
 
-  // Bulk complete overdue tasks
   document.getElementById('bulkComplete').addEventListener('click', ()=>{
     const overdueTasks = tasks.filter(t => t.status !== 'done' && new Date(t.due).getTime() <= Date.now());
     if(overdueTasks.length === 0) {
@@ -1484,7 +1394,6 @@
     }
   });
 
-  // Extend all tasks by 1 hour
   document.getElementById('extendAllTasks').addEventListener('click', ()=>{
     const activeTasks = tasks.filter(t => t.status !== 'done');
     if(activeTasks.length === 0) {
@@ -1503,10 +1412,8 @@
 
 
   document.getElementById('adminSilence').addEventListener('click', ()=>{
-    // Comprehensive alarm stopping
     alarmingTaskIds.clear();
     
-    // Stop all audio contexts
     try {
       if(audioCtx) {
         audioCtx.close();
@@ -1514,11 +1421,9 @@
       }
     } catch(e) {}
     
-    // Clear any stored alarm data
     try {
       localStorage.removeItem('mag_alarm_state');
       localStorage.removeItem('mag_alarming_tasks');
-      // Clear any fruit-specific alarm data
       ['apple', 'banana', 'strawberry', 'pineapple', 'orange', 'grapes'].forEach(fruitId => {
         localStorage.removeItem(`mag_alarm_${fruitId}`);
       });
@@ -1595,7 +1500,6 @@
   function ensureAudio(){
     if(audioCtx){ if(audioCtx.state==='suspended'){ audioCtx.resume().catch(()=>{}); } return audioCtx; }
     audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-    // Proactively resume on user gestures (needed on iOS Safari)
     const resume = ()=>{ try{ audioCtx && audioCtx.resume(); }catch(_){} };
     window.addEventListener('touchstart', resume, {once:true, passive:true});
     window.addEventListener('pointerdown', resume, {once:true});
@@ -1651,11 +1555,9 @@
       const f=JSON.parse(localStorage.getItem('mag_fruits')); 
       const af=JSON.parse(localStorage.getItem('mag_admin_fruits')); 
       
-      // Only load fruits if they exist and are valid
       if(f && Array.isArray(f) && f.length > 0) {
         fruits = f;
       }
-      // Otherwise keep the default fruits array
       
       if(af && Array.isArray(af)) {
         adminFruits = af;

@@ -1,0 +1,1683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Magnet Tasks – DECO3500 Prototype</title>
+  <style>
+    :root{
+      --bg1:#0c1016; --bg2:#0a0d14; --muted:#9aa3b8; --text:#eaf1ff; --brand:#6ee7ff; --ok:#31d0aa; --warn:#ffcf5c; --danger:#ff6b6b;
+      --ring: 0 0 0 2px rgba(110,231,255,.35), 0 8px 24px rgba(110,231,255,.18);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji"; background:radial-gradient(120% 120% at 50% -10%, #131a25 0, var(--bg1) 35%, var(--bg2) 100%); color:var(--text); position:relative}
+    body::before{content:""; position:fixed; top:0; left:0; right:0; bottom:0; background:radial-gradient(circle at 20% 80%, rgba(110,231,255,0.03) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(49,208,170,0.03) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(255,207,92,0.02) 0%, transparent 50%); pointer-events:none; z-index:-1}
+    header{position:sticky;top:0;background:rgba(15,18,25,.7);backdrop-filter:blur(15px);border-bottom:1px solid rgba(29,36,49,0.8); z-index:10; box-shadow:0 4px 20px rgba(0,0,0,0.1)}
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}
+    h1{font-size:20px;margin:0;letter-spacing:.2px;display:flex;align-items:center;gap:10px}
+    .tag{font-size:12px;color:#071018;background:var(--brand);padding:3px 8px;border-radius:999px;font-weight:600; animation:pulse 3s ease-in-out infinite; box-shadow:0 0 10px rgba(110,231,255,0.3)}
+    @keyframes pulse{0%, 100%{box-shadow:0 0 10px rgba(110,231,255,0.3)}50%{box-shadow:0 0 20px rgba(110,231,255,0.5)}}
+    .muted{color:var(--muted);font-size:12px}
+    /* Make Open Monitor stand out */
+    /* Revert monitor button to ghost style */
+    #monitorBtn{ text-align:center; }
+
+    .hero{display:grid;place-items:center;min-height:70vh;width:100%}
+    .card{background:transparent;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06); transition:all 0.3s ease}
+    .hero-card{overflow:visible;text-align:center;backdrop-filter:blur(8px);background:linear-gradient(180deg,rgba(20,26,36,.5),rgba(20,26,36,.2)); border:1px solid rgba(110,231,255,0.1)}
+    .title{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:90px;position:relative;z-index:4; animation:float 6s ease-in-out infinite}
+    .title h2{margin:0;font-size:18px;color:#f2f6ff; text-shadow:0 2px 4px rgba(0,0,0,0.3)}
+    @keyframes float{0%, 100%{transform:translateY(0px)}50%{transform:translateY(-3px)}}
+    
+    /* Info button styling */
+    /* Info button now uses .ghost style for uniformity with header buttons */
+    .info-btn{ all: unset; }
+    
+    /* Info modal content styling */
+    .info-content{
+      max-height: 70vh;
+      overflow-y: auto;
+      padding: 20px 0;
+    }
+    .info-section{
+      margin-bottom: 25px;
+      padding: 15px;
+      background: rgba(20,26,36,0.3);
+      border-radius: 12px;
+      border: 1px solid rgba(110,231,255,0.1);
+    }
+    .info-section h4{
+      color: #6ee7ff;
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .info-section ul{
+      margin: 0;
+      padding-left: 20px;
+    }
+    .info-section li{
+      margin-bottom: 8px;
+      color: #eaf1ff;
+      line-height: 1.5;
+    }
+    .info-section strong{
+      color: #6ee7ff;
+    }
+
+    /* Basket */
+    .basket{position:relative;padding:48px 28px 32px;border-radius:28px;max-width:740px;margin:0 auto; pointer-events: none;}
+    .basket .inner{position:relative; z-index:5; pointer-events: auto;}
+    .basket .handle{position:absolute; left:50%; top:-100px; width:420px; height:180px; transform:translateX(-50%); border:16px solid #7f532c; border-bottom:none; border-radius:420px 420px 0 0; background: radial-gradient(120% 80% at 50% 100%, rgba(0,0,0,.45), transparent 60%); box-shadow: inset 0 -14px 20px rgba(0,0,0,.35), 0 16px 26px rgba(0,0,0,.35); z-index:1}
+    .basket .handle:after{content:""; position:absolute; inset:10px; border:10px solid #a9733e; border-bottom:none; border-radius:400px 400px 0 0; filter:brightness(1.05)}
+    .basket .rim{position:absolute; left:14px; right:14px; top:-10px; height:36px; border-radius:22px 22px 0 0; background: linear-gradient(180deg,#b4783e,#7b4f28 55%, #4e3319); border:1px solid #3a2816; box-shadow: inset 0 8px 12px rgba(255,255,255,.12), inset 0 -10px 16px rgba(0,0,0,.55), 0 10px 18px rgba(0,0,0,.32); z-index:3}
+    .basket .topBar{position:absolute; left:24px; right:24px; top:8px; height:28px; border-radius:16px; background:linear-gradient(180deg,#b88752,#7c532e 60%,#4f341b); box-shadow:0 6px 14px rgba(0,0,0,.35), inset 0 6px 10px rgba(255,255,255,.08); z-index:3}
+    .basket:before, .basket:after{content:""; position:absolute; top:24px; bottom:16px; width:30px; border-radius:20px; background: linear-gradient(180deg,#b27a43,#815229 60%, #4f331b); box-shadow: inset 0 8px 12px rgba(255,255,255,.08), inset 0 -10px 16px rgba(0,0,0,.5); z-index:2}
+    .basket:before{left:16px} .basket:after{right:16px}
+    .basket .inner{position:relative; padding:22px; border-radius:0 0 28px 28px; overflow:hidden; border:1px solid #3a2a17; box-shadow: inset 0 22px 32px rgba(0,0,0,.45), inset 0 -12px 20px rgba(0,0,0,.42); display:flex; justify-content:center; background:transparent; z-index:0}
+    .basket .inner:before{content:""; position:absolute; inset:0; background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'><defs><linearGradient id='g1' x1='0' y1='0' x2='0' y2='1'><stop offset='0%' stop-color='%23bf7b41'/><stop offset='100%' stop-color='%23724627'/></linearGradient></defs><rect width='72' height='72' fill='%2351371d'/><g opacity='0.9'><rect x='0' width='26' height='72' fill='url(%23g1)'/><rect x='46' width='26' height='72' fill='url(%23g1)'/></g><g opacity='0.95'><rect y='0' width='72' height='26' fill='url(%23g1)'/><rect y='46' width='72' height='26' fill='url(%23g1)'/></g></svg>") repeat; background-size:72px 72px; filter:saturate(1.05)}
+    .basket .inner:after{content:""; position:absolute; inset:0; background: radial-gradient(120% 100% at 50% -10%, rgba(255,255,255,.18), rgba(255,255,255,0) 40%), radial-gradient(120% 140% at 50% 120%, rgba(0,0,0,.6), rgba(0,0,0,0) 64%)}
+    .basket .cloth{position:absolute; left:24px; right:24px; top:6px; height:22px; border-radius:12px; box-shadow: inset 0 2px 3px rgba(255,255,255,.25), 0 2px 6px rgba(0,0,0,.25); background:
+      linear-gradient(45deg, rgba(255,255,255,.12) 25%, rgba(255,255,255,0) 25% 50%, rgba(255,255,255,.12) 50% 75%, rgba(255,255,255,0) 75%),
+      repeating-linear-gradient(0deg, #ffffff22 0 2px, #ffffff0a 2px 4px),
+      linear-gradient(180deg,#cfd7e6,#9eb3d6); opacity:.85}
+    .basket .frontWall{position:absolute; left:22px; right:22px; bottom:22px; height:72px; border-radius:0 0 22px 22px; overflow:hidden; pointer-events:none; box-shadow: 0 -8px 12px rgba(0,0,0,.35), inset 0 -12px 18px rgba(0,0,0,.35); z-index:2}
+    .basket .frontWall:before{content:""; position:absolute; inset:0; background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><defs><linearGradient id='g1' x1='0' y1='0' x2='0' y2='1'><stop offset='0%' stop-color='%23c48247'/><stop offset='100%' stop-color='%23754728'/></linearGradient></defs><rect width='80' height='80' fill='%2351371d'/><g opacity='0.9'><rect x='0' width='30' height='80' fill='url(%23g1)'/><rect x='50' width='30' height='80' fill='url(%23g1)'/></g><g opacity='0.95'><rect y='0' width='80' height='30' fill='url(%23g1)'/><rect y='50' width='80' height='30' fill='url(%23g1)'/></g></svg>") repeat; background-size:80px 80px}
+    .basket .frontWall:after{content:""; position:absolute; inset:-12px -14px -22px -14px; background: radial-gradient(120% 60% at 50% 0%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%), radial-gradient(120% 80% at 50% 120%, rgba(0,0,0,.58), rgba(0,0,0,0) 64%)}
+    .basket .baseShadow{position:absolute; left:26px; right:26px; bottom:8px; height:14px; border-radius:999px; background: radial-gradient(60% 120% at 50% 50%, rgba(0,0,0,.5), rgba(0,0,0,0)); filter:blur(0.8px)}
+
+    .board{
+      display:flex;flex-wrap:wrap;gap:24px;min-height:340px;position:relative;max-width:980px;margin:0 auto;padding:44px;justify-content:center;align-items:center;align-content:center;
+      border-radius:20px;
+      background:linear-gradient(135deg, rgba(20,26,36,0.8), rgba(15,20,30,0.9)); 
+      border:1px solid rgba(110,231,255,0.1); 
+      backdrop-filter:blur(10px); 
+      box-shadow:0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+      pointer-events: auto !important;
+      z-index: 10 !important;
+    }
+    
+    /* Dynamic layout adjustments for different fruit counts */
+    .board:has(.fruit:nth-child(1):last-child) { 
+      justify-content: center; 
+      gap: 0;
+    }
+    .board:has(.fruit:nth-child(2):last-child) { 
+      justify-content: center; 
+      gap: 50px; 
+    }
+    .board:has(.fruit:nth-child(3):last-child) { 
+      justify-content: center; 
+      gap: 35px; 
+    }
+    .board:has(.fruit:nth-child(4):last-child) { 
+      justify-content: center; 
+      gap: 28px; 
+    }
+    .board:has(.fruit:nth-child(5):last-child) { 
+      justify-content: center; 
+      gap: 24px; 
+    }
+    .board:has(.fruit:nth-child(6):last-child) { 
+      justify-content: center; 
+      gap: 20px; 
+    }
+    
+    /* Ensure fruits are properly sized and spaced */
+    .board .fruit{
+      width:128px;height:128px;
+      flex-shrink: 0;
+    }
+    .board .fruit[data-size="lg"]{
+      width:148px;height:148px;
+    }
+    .board .fruit[data-size="sm"]{
+      width:108px;height:108px;
+    }
+    .fruit{
+      aspect-ratio:1/1;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;user-select:none;border:3px solid rgba(110,231,255,.3);position:relative;transition:all .4s cubic-bezier(0.4, 0, 0.2, 1); 
+      background:linear-gradient(135deg, #3a4a6b 0%, #2a3450 50%, #1a2338 100%); 
+      box-shadow:inset 0 2px 8px rgba(255,255,255,.15), inset 0 -4px 12px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3), 0 0 0 1px rgba(110,231,255,.1); 
+      filter:drop-shadow(0 4px 12px rgba(0,0,0,.4));
+      pointer-events: auto !important;
+      z-index: 10 !important;
+    }
+    
+    .fruit .emoji{
+      font-size: 38px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,.3));
+      transition: all .3s ease;
+    }
+    
+    .fruit .name{
+      font-size: 12px;
+      font-weight: 600;
+      color: #eaf1ff;
+      text-shadow: 0 1px 2px rgba(0,0,0,.5);
+      letter-spacing: 0.5px;
+    }
+    
+    .fruit:hover{
+      transform:translateY(-6px) scale(1.05); 
+      filter:saturate(1.2) brightness(1.1) drop-shadow(0 6px 16px rgba(0,0,0,.5)); 
+      border-color:rgba(110,231,255,.6); 
+      box-shadow:inset 0 2px 12px rgba(255,255,255,.2), inset 0 -6px 16px rgba(0,0,0,.5), 0 12px 32px rgba(0,0,0,.4), 0 0 20px rgba(110,231,255,.3);
+    }
+    
+    .fruit:hover .emoji{
+      transform: scale(1.1);
+      filter: drop-shadow(0 3px 6px rgba(0,0,0,.4));
+    }
+    
+    .fruit::after{
+      content:""; position:absolute; inset:6px 10px auto 10px; height:16px; border-radius:999px; background:linear-gradient(180deg, rgba(255,255,255,.38), rgba(255,255,255,0)); opacity:.35;
+    }
+    .fruit[data-size="lg"] .emoji{font-size: 50px}
+    .fruit[data-size="sm"] .emoji{font-size: 30px}
+    .fruit .name{font-size:12px;color:#cfd8f0; text-shadow:0 1px 0 rgba(0,0,0,.6)}
+    .fruit::before{content:""; position:absolute; left:20%; right:20%; bottom:10px; height:14px; border-radius:999px; background:radial-gradient(70% 120% at 50% 50%, rgba(0,0,0,.45), rgba(0,0,0,0)); filter:blur(.5px)}
+    .fruit.out{opacity:.35; filter:grayscale(1) brightness(.9); pointer-events:none}
+
+    /* -------- Responsive: phones -------- */
+    @media (max-width: 600px){
+      .wrap{padding:14px}
+      h1{font-size:18px}
+      header .wrap{gap:10px}
+      header .wrap > div:last-child{display:flex;flex-wrap:wrap;gap:8px}
+      /* Center Open Monitor and make it span full width on phones */
+      #monitorBtn{flex:1 1 100%; text-align:center}
+      .hero-card{padding:14px}
+      .title h2{font-size:16px}
+      .title .muted{font-size:11px}
+      main.wrap{padding:0}
+      .grid{display:flex;flex-direction:column;gap:12px}
+      .card{padding:12px;margin:0}
+      .controls{display:flex;flex-wrap:wrap;gap:8px}
+      .controls input[type="text"], .controls select, .controls button{flex:1 1 100%; min-height:36px}
+      .rows .row{padding:10px}
+      .rows .row .left, .rows .row .right{width:100%}
+      .rows .row .right{display:flex;gap:8px;flex-wrap:wrap}
+      .rows .row .right button{flex:1 1 calc(50% - 8px)}
+      dialog{padding:0}
+      dialog .modal{padding:12px; width:92vw; max-width:92vw; max-height:80vh; overflow:auto; border-radius:14px}
+      dialog .modal h3{font-size:16px}
+      dialog .modal label{font-size:12px}
+      dialog .modal input, dialog .modal select, dialog .modal button{font-size:14px}
+      /* Slimmer, smoother handle on phones */
+      .basket .handle{top:-48px; width:330px; height:160px; border-width:12px; transform:translateX(-50%) scale(.92); border-color:#8a5d33; box-shadow: inset 0 -10px 16px rgba(0,0,0,.3), 0 10px 20px rgba(0,0,0,.28)}
+      .basket .handle:after{inset:8px; border-width:8px; border-color:#b17a45; filter:brightness(1.03)}
+      .basket .rim,.basket .topBar{transform:scale(.9);}
+      .basket .inner{padding:12px; overflow:hidden}
+      /* Keep full basket visible, just scale subtly */
+      .basket{transform:scale(.9); transform-origin: top center}
+      .basket .inner{border:1px solid rgba(110,231,255,0.12); box-shadow: inset 0 8px 16px rgba(0,0,0,.25)}
+      .board{padding:18px; gap:18px; min-height:auto; max-width:360px; margin:0 auto;
+        background:rgba(15,20,30,0.6); border:1px solid rgba(110,231,255,0.12); box-shadow:0 6px 18px rgba(0,0,0,.25);
+        /* switch to grid on phones for perfect centering */
+        display:grid; grid-template-columns:repeat(2, auto); place-items:center; place-content:center}
+      .board .fruit{width:96px;height:96px; justify-self:center; align-self:center}
+      .board .fruit[data-size="lg"]{width:108px;height:108px}
+      .board .fruit[data-size="sm"]{width:80px;height:80px}
+      .fruit .emoji{font-size:28px}
+      .fruit[data-size="lg"] .emoji{font-size:36px}
+      .fruit[data-size="sm"] .emoji{font-size:22px}
+      .rows .row{flex-direction:column; align-items:flex-start; gap:8px; padding:10px}
+      .rows .row .title, .rows .row .desc{font-size:14px}
+      .rows .row .meta{font-size:12px}
+      .priority-pill{transform:scale(.9); transform-origin:left center}
+      .controls{flex-wrap:wrap; gap:8px}
+      dialog .modal{width:92vw; max-width:92vw}
+      .admin-section{padding:10px}
+      .admin-fruits-grid, .extra-tasks-grid{display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px}
+      .admin-fruit, .extra-task-item{min-width:0}
+    }
+
+    /* Extra-compact phones */
+    @media (max-width: 420px){
+      .wrap{padding:12px}
+      h1{font-size:16px}
+      .hero-card{padding:12px}
+      .title{margin-bottom:8px}
+      .title h2{font-size:15px}
+      .title .muted{font-size:10px}
+      .controls input[type="text"], .controls select, .controls button{flex:1 1 100%}
+      .rows .row .right button{flex:1 1 100%}
+      /* Show full basket on very small phones, scaled */
+      .basket{margin:0; transform:scale(.85); transform-origin: top center}
+      .basket .handle{top:-40px; width:300px; height:140px; border-width:10px}
+      .basket .handle:after{inset:7px; border-width:7px}
+      .basket .inner{padding:10px; overflow:hidden}
+      .board{padding:14px; gap:16px; min-height:auto; max-width:300px; margin:0 auto;
+        background:rgba(15,20,30,0.55); border:1px solid rgba(110,231,255,0.12); box-shadow:0 4px 14px rgba(0,0,0,.22)}
+      /* keep grid layout on extra-compact phones */
+      .board{display:grid; grid-template-columns:repeat(2, auto); place-items:center; place-content:center}
+      .board .fruit{width:88px;height:88px; justify-self:center; align-self:center}
+      .board .fruit[data-size="lg"]{width:92px;height:92px}
+      .board .fruit[data-size="sm"]{width:68px;height:68px}
+      .fruit .emoji{font-size:24px}
+      .fruit[data-size="lg"] .emoji{font-size:30px}
+      .fruit[data-size="sm"] .emoji{font-size:20px}
+      .fruit .name{font-size:11px}
+      dialog .modal{width:96vw; max-width:96vw; max-height:78vh; overflow:auto}
+      dialog .modal h3{font-size:15px}
+      dialog .modal label{font-size:11px}
+      dialog .modal input, dialog .modal select, dialog .modal button{font-size:13px}
+      .rows .row .title, .rows .row .desc{font-size:13px}
+      .rows .row .meta{font-size:11px}
+      .controls input[type="text"], .controls select{width:100%}
+    }
+    .fruit .badge{position:absolute; top:8px; right:10px; background:#1b2537; border:1px solid #2a3650; color:#d7e3ff; font-size:10px; padding:2px 6px; border-radius:999px}
+    .fruit .return-btn{position:absolute; top:8px; left:8px; background:#1b2537; border:1px solid #2a3650; color:#d7e3ff; font-size:12px; padding:4px 6px; border-radius:999px; cursor:pointer; opacity:0.8; transition:opacity 0.2s ease}
+    .fruit .return-btn:hover{opacity:1; background:#2a3650}
+    
+    /* Magical return effect styles */
+    .fruit.returning{animation:fadeOut 0.8s ease-in-out forwards; pointer-events:none}
+    @keyframes fadeOut{
+      0%{opacity:1; transform:scale(1)}
+      100%{opacity:0; transform:scale(0.8)}
+    }
+    
+    /* Admin fruit visual indicator */
+    .fruit.admin-fruit{
+      border: 3px solid rgba(255,215,0,0.7) !important;
+      background: linear-gradient(135deg, #4a5a7b 0%, #3a4a6b 50%, #2a3450 100%) !important;
+      box-shadow: 
+        inset 0 2px 8px rgba(255,255,255,.2), 
+        inset 0 -4px 12px rgba(0,0,0,.4), 
+        0 8px 24px rgba(0,0,0,.3),
+        0 0 0 1px rgba(110,231,255,.1),
+        0 0 20px rgba(255,215,0,0.4) !important;
+    }
+    
+    .fruit.admin-fruit::before{
+      content: "🔙";
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      font-size: 16px;
+      background: rgba(255,215,0,0.95);
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      animation: gentlePulse 2s ease-in-out infinite;
+      box-shadow: 0 2px 8px rgba(255,215,0,0.5);
+    }
+    
+    @keyframes gentlePulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+    
+    .fruit.returnable{
+      cursor:pointer; position:relative;
+    }
+    
+    .fruit.returnable::before{
+      content:"✨"; position:absolute; top:-8px; right:-8px; font-size:16px; animation:sparkle 2s ease-in-out infinite; opacity:0.7; z-index: 10;
+    }
+    
+    @keyframes sparkle{
+      0%, 100%{transform:scale(1) rotate(0deg); opacity:0.7}
+      50%{transform:scale(1.3) rotate(180deg); opacity:1}
+    }
+    
+    .fruit.returnable:hover::before{animation-duration:0.5s; opacity:1}
+
+    .rows{display:flex;flex-direction:column;gap:10px}
+    .row{display:grid;grid-template-columns:26px 1.2fr .7fr .6fr .6fr auto;align-items:center;gap:10px;padding:12px;border:1px solid #21293a;border-radius:12px;background:rgba(18,22,34,.8);backdrop-filter:blur(2px)}
+    .row.overdue{border-color:var(--danger);background:linear-gradient(180deg,#1a1114,#151727)}
+    .row .dot{width:10px;height:10px;border-radius:999px;background:var(--ok)}
+    .row.overdue .dot{background:var(--danger)}
+    .row .fruitCol{display:flex;align-items:center;gap:8px}
+    .row .fruitCol .emoji{font-size:20px}
+    .row .task{font-weight:600}
+    .pill{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid #2a3042;background:#0f1421;color:#c6d0ea;display:inline-flex;gap:6px;align-items:center}
+    .priority-pill{font-weight:bold}
+    .priority-pill.priority-high{border-color:#ff6b6b;background:#1a0f12;color:#ff6b6b}
+    .priority-pill.priority-medium{border-color:#ffcf5c;background:#1a1612;color:#ffcf5c}
+    .priority-pill.priority-low{border-color:#31d0aa;background:#0f1a12;color:#31d0aa}
+    .actions{display:flex;gap:8px;justify-content:flex-end}
+    button{all:unset;display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:1px solid #253049;border-radius:10px;background:#0f1622;cursor:pointer;transition:all .2s cubic-bezier(0.4, 0, 0.2, 1); position:relative; overflow:hidden}
+    button::before{content:""; position:absolute; top:0; left:-100%; width:100%; height:100%; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transition:left 0.5s ease}
+    button:hover{box-shadow:var(--ring); transform:translateY(-1px); border-color:rgba(110,231,255,0.3)}
+    button:hover::before{left:100%}
+    button:active{transform:translateY(0px)}
+    .danger{border-color:#462126;background:#1a0f12}
+    .primary{border-color:#1d3a46;background:#0f1a20}
+    .ghost{border-color:#2a3142;background:#0c1220}
+
+    .controls{display:flex;gap:10px;align-items:center;margin:8px 0 2px 0;flex-wrap:wrap}
+    .controls input, .controls select{padding:10px 12px;border-radius:10px;border:1px solid #243047;background:#0c1220;color:#eaf1ff}
+    .withIcon{display:flex; align-items:center; gap:8px}
+    .iconBtn{all:unset; width:38px; height:38px; display:inline-grid; place-items:center; border:1px solid #253049; border-radius:10px; background:#0f1622; cursor:pointer}
+    .iconBtn:hover{box-shadow:var(--ring)}
+    
+    /* Password input styling for consistency */
+    #adminPwd{width:200px; height:38px; padding:10px 12px; border-radius:10px; border:1px solid #243047; background:#0c1220; color:#eaf1ff; font-size:14px; box-sizing:border-box}
+    #togglePwd{width:38px; height:38px; display:inline-grid; place-items:center; border:1px solid #253049; border-radius:10px; background:#0f1622; cursor:pointer; font-size:16px; flex-shrink:0}
+    #adminLoginBtn{height:38px; padding:10px 16px; border-radius:10px; border:1px solid #1d3a46; background:#0f1a20; color:#eaf1ff; cursor:pointer; font-size:14px; flex-shrink:0}
+    .dateWrap input[type="date"]{min-width:0}
+
+    dialog{border:none;border-radius:16px;padding:0;max-width:600px;width:92vw;background:#0f1422;color:var(--text); box-shadow:0 40px 100px rgba(0,0,0,.6), 0 0 0 1px rgba(110,231,255,0.1); backdrop-filter:blur(10px)}
+    .modal{padding:18px}
+    .modal h3{margin:0 0 8px 0}
+    .form{display:grid;gap:10px}
+    label{font-size:12px;color:#a9b3c9}
+    input[type="text"], input[type="date"], input[type="time"], select{width:100%;padding:10px;border-radius:10px;border:1px solid #243047;background:#0c1220;color:#eaf1ff; transition:all 0.2s ease}
+    input[type="text"]:focus, input[type="date"]:focus, input[type="time"]:focus, select:focus{border-color:rgba(110,231,255,0.5); box-shadow:0 0 0 2px rgba(110,231,255,0.1); outline:none}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .modal .actions{margin-top:10px}
+
+    /* Admin specific styles */
+    .admin-section{margin:16px 0; padding:12px; border:1px solid #2a3a56; border-radius:12px; background:rgba(15,22,34,.6)}
+    .admin-section h4{margin:0 0 12px 0; color:#6ee7ff; font-size:14px}
+    .admin-fruits-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+    .admin-fruit{aspect-ratio:1/1; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; cursor:pointer; border:1px solid #3a4a66; background:radial-gradient(120% 100% at 50% 0%, #2a3450 0%, #141c2c 70%); transition:transform .12s ease}
+    .admin-fruit:hover{transform:translateY(-2px); border-color:#6ee7ff}
+    .admin-fruit .emoji{font-size:24px}
+    .admin-fruit .name{font-size:10px; color:#cfd8f0}
+    .activity-stats{display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:10px}
+    .stat-item{padding:8px; border:1px solid #2a3a56; border-radius:8px; background:rgba(15,22,34,.4); text-align:center}
+    .stat-number{font-size:18px; font-weight:bold; color:#6ee7ff}
+    .stat-label{font-size:11px; color:#9aa3b8}
+    .admin-controls{display:flex; gap:8px; margin:8px 0; flex-wrap:wrap}
+    .admin-task-controls{display:flex; gap:8px; flex-wrap:wrap}
+    .admin-description{font-size:12px; color:#9aa3b8; margin:0 0 10px 0}
+    .extra-tasks-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px}
+    .extra-task-item{aspect-ratio:1/1; border-radius:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; cursor:pointer; border:1px solid #3a4a66; background:radial-gradient(120% 100% at 50% 0%, #2a3450 0%, #141c2c 70%); transition:transform .12s ease; position:relative}
+    .extra-task-item:hover{transform:translateY(-2px); border-color:#31d0aa}
+    .extra-task-item .emoji{font-size:24px}
+    .extra-task-item .name{font-size:10px; color:#cfd8f0}
+    .extra-task-item .status{position:absolute; top:4px; right:4px; font-size:8px; background:#31d0aa; color:#000; padding:2px 4px; border-radius:4px; font-weight:bold}
+
+    .toast{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:10px;z-index:5}
+    .toast .t{background:#0e1524;border:1px solid #21304a;padding:10px 12px;border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.4)}
+    .log{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow:auto}
+    .logItem{font-size:13px;padding:8px 10px;border:1px dashed #27324a;border-radius:10px;background:#0b111e}
+
+    @keyframes shake{10%,90%{transform:translate3d(-1px,0,0)}20%,80%{transform:translate3d(2px,0,0)}30%,50%,70%{transform:translate3d(-4px,0,0)}40%,60%{transform:translate3d(4px,0,0)}}
+    .shake{animation:shake .6s;animation-iteration-count:infinite}
+
+    @media(max-width:900px){.board{grid-template-columns:repeat(8,1fr)} .basket .handle{width:380px;height:170px;top:-92px} .title{margin-bottom:110px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="display:flex;align-items:center;gap:14px;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px">
+        <h1>🍽️ Magnet Tasks <span class="tag">DECO3500</span></h1>
+        
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button id="infoBtn" class="ghost" title="How everything works">Info</button>
+        <button class="ghost" id="monitorBtn" title="Open monitor window">Open Monitor</button>
+        <button class="ghost" id="adminBtn" title="Admin mode">Admin</button>
+        <button id="clearBtn" class="danger" title="Clear all tasks (local only)">Clear</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="hero">
+      <section class="card hero-card">
+        <div class="title">
+          <h2>Basket Board (pick a fruit)</h2>
+          <span class="muted">Click a fruit to assign a task</span>
+        </div>
+        <div class="basket">
+          <div class="handle" aria-hidden="true"></div>
+          <div class="rim" aria-hidden="true"></div>
+          <div class="topBar" aria-hidden="true"></div>
+          <div class="cloth" aria-hidden="true"></div>
+          <div class="inner">
+            <div class="board" id="board"></div>
+          </div>
+          <div class="frontWall" aria-hidden="true"></div>
+          <div class="baseShadow" aria-hidden="true"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="grid" id="logSection">
+      <section class="card" style="min-height:210px">
+        <div class="title"><h2>Activity Log</h2><span class="muted">Who did what, and when</span></div>
+        <div class="log" id="log"></div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:16px">
+      <div class="title"><h2>Active Tasks</h2><span class="muted">Return fruit to the basket to complete</span></div>
+      <div class="controls">
+        <input id="search" type="text" placeholder="Search tasks" />
+        <select id="filterPrio">
+          <option value="all">All priorities</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+          <option value="none">No priority</option>
+        </select>
+      </div>
+      <div class="rows" id="rows"></div>
+      <div class="muted" style="margin-top:10px">The Activity Log above records every change in real time.</div>
+      <div class="muted" style="margin-top:10px">Overdue tasks will <strong style="color:var(--danger)">buzz and shake</strong> and cannot be silenced until returned.</div>
+    </section>
+  </main>
+
+  <!-- Assign modal -->
+  <dialog id="modal">
+    <div class="modal">
+      <h3 id="modalTitle">Assign Task</h3>
+      <div class="form">
+        <div>
+          <label>Your name</label>
+          <input id="mUser" type="text" placeholder="e.g., Sahaj" />
+        </div>
+        <div class="row2">
+          <div>
+            <label>Fruit</label>
+            <input id="mFruit" type="text" disabled />
+          </div>
+          <div>
+            <label>Priority (preset)</label>
+            <select id="mPriority">
+              <option value="">None</option>
+              <option>High</option>
+              <option>Medium</option>
+              <option>Low</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label>Task description</label>
+          <input id="mTask" type="text" placeholder="e.g., Buy onions" />
+        </div>
+        <div class="row2">
+          <div class="dateWrap">
+            <label>Due date</label>
+            <div class="withIcon">
+              <input id="mDate" type="date" />
+              <button type="button" id="openCal" class="iconBtn" title="Open calendar" aria-label="Open calendar">📅</button>
+            </div>
+          </div>
+          <div>
+            <label>Due time</label>
+            <input id="mTime" type="time" />
+          </div>
+        </div>
+        <div>
+          <label>Or, due in… (minutes)</label>
+          <select id="mDueIn">
+            <option value="">— select —</option>
+            <option>5</option><option>10</option><option>15</option><option>30</option><option>45</option><option>60</option>
+          </select>
+        </div>
+        <div class="actions">
+          <button id="cancelBtn">Cancel</button>
+          <button class="primary" id="saveBtn">Assign</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Admin modal -->
+  <dialog id="adminDialog">
+    <div class="modal">
+      <h3>Admin Mode</h3>
+      <div id="adminLogin">
+        <div style="text-align:center; padding:20px 0;">
+          <h2 style="margin:0 0 16px 0; color:var(--brand);">Welcome to Admin Mode! 👋</h2>
+          <p style="margin:0 0 24px 0; color:var(--muted);">Access additional features for managing your tasks</p>
+          <ul style="text-align:left; display:inline-block; margin:0; padding-left:24px; color:var(--muted);">
+            <li>Add extra fruits to the main screen</li>
+            <li>View detailed activity statistics</li>
+            <li>Manage and control all tasks</li>
+            <li>Silence all alarms</li>
+          </ul>
+          <button id="adminLoginBtn" class="primary" style="margin-top:24px;">Enter Admin Mode</button>
+        </div>
+      </div>
+      <div id="adminPanel" style="display:none; gap:10px" class="form">
+        <div class="actions">
+          <button id="adminSilence" class="ghost">Silence all alarms</button>
+          <button id="adminClose" class="primary">Close</button>
+        </div>
+        
+        <!-- Extra Tasks Section -->
+        <div class="admin-section">
+          <h4>📋 Extra Tasks</h4>
+          <p class="admin-description">Extra fruits available for task assignment (admin only):</p>
+          <div class="extra-tasks-grid" id="extraTasksGrid"></div>
+        </div>
+
+        <!-- Enhanced Activity Log -->
+        <div class="admin-section">
+          <h4>📊 Activity Overview</h4>
+          <div class="activity-stats" id="activityStats"></div>
+          <div class="admin-controls">
+            <button id="toggleActivityLog" class="ghost">Show/Hide Detailed Log</button>
+            <button id="refreshStats" class="ghost">🔄 Refresh Stats</button>
+          </div>
+          <div id="adminActivityLog" style="display:none; max-height:200px; overflow-y:auto; margin-top:10px;">
+            <div class="log" id="adminLog"></div>
+          </div>
+        </div>
+
+        <!-- Task Management -->
+        <div class="admin-section">
+          <h4>⚙️ Task Management</h4>
+          <div class="admin-task-controls">
+            <button id="bulkComplete" class="primary">✅ Complete All Overdue</button>
+            <button id="extendAllTasks" class="ghost">⏰ Extend All by 1 Hour</button>
+          </div>
+        </div>
+
+        <div>
+          <label>Force return (simulate put back)</label>
+          <div class="withIcon">
+            <select id="forceSelect"></select>
+            <button id="forceReturn" class="primary">Return</button>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Info Modal -->
+  <dialog id="infoDialog">
+    <div class="modal">
+      <h3>🍎 Magnet Tasks - Complete Guide</h3>
+      <div class="info-content">
+        
+        <div class="info-section">
+          <h4>🎯 Main Features</h4>
+          <ul>
+            <li><strong>Fruit-Based Task Management:</strong> Assign tasks to fruits and track their completion</li>
+            <li><strong>Priority System:</strong> High, Medium, Low priorities with visual size differences</li>
+            <li><strong>Admin Mode:</strong> Advanced features and extra fruits</li>
+            <li><strong>Real-time Alarms:</strong> Audio notifications when tasks are due</li>
+            <li><strong>Activity Tracking:</strong> Complete log of all actions and task completions</li>
+          </ul>
+        </div>
+
+        <div class="info-section">
+          <h4>🍍 Main Screen Fruits</h4>
+          <ul>
+            <li><strong>🍍 Pineapple:</strong> High Priority (Large size)</li>
+            <li><strong>🍊 Orange:</strong> Medium Priority (Medium size)</li>
+            <li><strong>🍇 Grapes:</strong> Low Priority (Small size)</li>
+            <li><strong>Click any fruit:</strong> Assign a task with due date/time</li>
+            <li><strong>Priority is preset:</strong> Cannot be changed for main fruits</li>
+          </ul>
+        </div>
+
+        <div class="info-section">
+          <h4>🔧 Admin Mode Features</h4>
+          <ul>
+            <li><strong>Access:</strong> Click "Monitor" → Enter admin password</li>
+            <li><strong>Extra Fruits:</strong> 🍎 Apple, 🍌 Banana, 🍓 Strawberry</li>
+            <li><strong>Add to Main:</strong> Click extra fruit → Confirm → Assign task</li>
+            <li><strong>Admin Fruits:</strong> Have golden border and 🔙 return icon</li>
+            <li><strong>Return to Admin:</strong> Double-click admin fruit on main screen</li>
+            <li><strong>Priority Setting:</strong> Admin fruits can have priority changed</li>
+            <li><strong>Activity Monitor:</strong> View all tasks, completions, and statistics</li>
+            <li><strong>Silence Alarms:</strong> Stop all active alarms</li>
+          </ul>
+        </div>
+
+        <div class="info-section">
+          <h4>⚡ Task Management</h4>
+          <ul>
+            <li><strong>Assign Task:</strong> Click fruit → Fill form → Save</li>
+            <li><strong>Due Date/Time:</strong> Set when task should be completed</li>
+            <li><strong>Alarm System:</strong> Audio alerts when tasks are due</li>
+            <li><strong>Complete Task:</strong> Return fruit to basket (double-click for admin fruits)</li>
+            <li><strong>Task Status:</strong> Active, Done, or Overdue</li>
+            <li><strong>Search & Filter:</strong> Find tasks by priority or text</li>
+          </ul>
+        </div>
+
+        <div class="info-section">
+          <h4>🎨 Visual Indicators</h4>
+          <ul>
+            <li><strong>Fruit Size:</strong> Larger = Higher Priority</li>
+            <li><strong>Golden Border:</strong> Admin fruits (can be returned)</li>
+            <li><strong>🔙 Icon:</strong> Return to admin (double-click)</li>
+            <li><strong>OUT Badge:</strong> Fruit is currently on a task</li>
+            <li><strong>Priority Pills:</strong> Color-coded (Red=High, Yellow=Medium, Green=Low)</li>
+          </ul>
+        </div>
+
+        <div class="info-section">
+          <h4>🔊 Alarm System</h4>
+          <ul>
+            <li><strong>Audio Alerts:</strong> Plays when tasks become due</li>
+            <li><strong>Auto-Stop:</strong> Alarms stop when tasks are completed</li>
+            <li><strong>Admin Control:</strong> Silence all alarms from admin panel</li>
+            <li><strong>Return Control:</strong> Returning fruits stops their alarms</li>
+          </ul>
+        </div>
+
+        <div class="info-section">
+          <h4>📊 Activity & Statistics</h4>
+          <ul>
+            <li><strong>Activity Log:</strong> Complete history of all actions</li>
+            <li><strong>Statistics:</strong> Task counts, completion rates</li>
+            <li><strong>Real-time Updates:</strong> Live updates across browser tabs</li>
+          </ul>
+        </div>
+
+        <div class="info-section">
+          <h4>⌨️ Keyboard Shortcuts</h4>
+          <ul>
+            <li><strong>Ctrl+Shift+A:</strong> Open Admin Mode</li>
+            <li><strong>Ctrl+Shift+M:</strong> Open Monitor Mode</li>
+          </ul>
+        </div>
+
+      </div>
+      <div class="modal-actions">
+        <button id="infoClose" class="btn">Got it!</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+  <audio id="alarmAudio"></audio>
+
+  <script>
+  // ===== Data =====
+  let fruits = [
+    { id:'pineapple', emoji:'🍍', name:'Pineapple', size:'lg', preset:'High' },
+    { id:'orange', emoji:'🍊', name:'Orange',    size:'md', preset:'Medium' },
+    { id:'grapes', emoji:'🍇', name:'Grapes',    size:'sm', preset:'Low' }
+  ];
+
+  let adminFruits = [
+    { id:'apple', emoji:'🍎', name:'Apple', size:'lg', preset:'High', adminOnly: true },
+    { id:'banana', emoji:'🍌', name:'Banana', size:'md', preset:'Medium', adminOnly: true },
+    { id:'strawberry', emoji:'🍓', name:'Strawberry', size:'sm', preset:'Low', adminOnly: true }
+  ];
+
+  let tasks = [];
+  let alarmingTaskIds = new Set();
+  let isAdminMode = false;
+  let toastEl, rowsEl, logEl, boardEl, searchEl, filterPrioEl, mUser;
+
+  const ce = (t)=>document.createElement(t);
+
+  // Returns true if the given fruit currently has an active (not done) task
+  function fruitActive(fid){
+    return tasks.some(t => t.fruitId === fid && t.status !== 'done');
+  }
+  const bc = ('BroadcastChannel' in window) ? new BroadcastChannel('magnet') : null;
+
+  // Test function for clicks
+  function testClick() {
+    alert('Test click works! Modal should open now...');
+    openAssignModal(fruits[0]); // Test with pineapple
+  }
+  
+  // Make testClick available globally
+  window.testClick = testClick;
+
+  (document.readyState === 'loading') ? document.addEventListener('DOMContentLoaded', init) : init();
+
+  function init(){
+    // KILL ANY PERSISTENT ALARMS IMMEDIATELY
+    alarmingTaskIds.clear();
+    
+    // Clear any stored alarm state
+    try {
+      localStorage.removeItem('mag_alarm_state');
+      localStorage.removeItem('mag_alarming_tasks');
+    } catch(e) {}
+    
+    toastEl = document.getElementById('toast');
+    rowsEl  = document.getElementById('rows');
+    logEl   = document.getElementById('log');
+    boardEl = document.getElementById('board');
+    searchEl = document.getElementById('search');
+    filterPrioEl = document.getElementById('filterPrio');
+
+    // Clear any corrupted localStorage data
+    try {
+      localStorage.removeItem('mag_fruits');
+      localStorage.removeItem('mag_admin_fruits');
+      console.log('Cleared corrupted localStorage data');
+    } catch(e) {
+      console.log('Could not clear localStorage:', e);
+    }
+    
+    // Force reset fruits to defaults
+    fruits = [
+      { id:'pineapple', emoji:'🍍', name:'Pineapple', size:'lg', preset:'High' },
+      { id:'orange', emoji:'🍊', name:'Orange',    size:'md', preset:'Medium' },
+      { id:'grapes', emoji:'🍇', name:'Grapes',    size:'sm', preset:'Low' }
+    ];
+    
+    tasks = loadState();
+    console.log('Fruits reset to defaults:', fruits);
+    
+    renderBoard(boardEl);
+    renderTasks();
+    wireHeader();
+    addLog('🧭 <b>Prototype loaded.</b> Pick a fruit to assign a task.');
+    
+    // Force render fruits if board is empty
+    setTimeout(() => {
+      console.log('Checking board state...');
+      console.log('Board element:', boardEl);
+      console.log('Board children count:', boardEl ? boardEl.children.length : 'no board');
+      console.log('Fruits array:', fruits);
+      
+      if (boardEl && boardEl.children.length === 0) {
+        console.log('Board is empty, forcing fruit render...');
+        fruits.forEach(f => {
+          const card = document.createElement('div');
+          card.className = 'fruit';
+          card.dataset.size = f.size;
+          card.style.pointerEvents = 'auto';
+          card.style.zIndex = '20';
+          card.innerHTML = `<div class="emoji">${f.emoji}</div><div class="name">${f.name}</div>`;
+          
+          // Simple click handler
+          card.onclick = function() {
+            openAssignModal(f);
+          };
+          
+          boardEl.appendChild(card);
+          console.log('Added fruit:', f.name);
+        });
+        console.log('Force render complete. Board children:', boardEl.children.length);
+      }
+    }, 100);
+    
+    // Additional fallback after longer delay
+    setTimeout(() => {
+      if (boardEl && boardEl.children.length === 0) {
+        console.log('Second attempt - board still empty, forcing render...');
+        renderBoard(boardEl);
+      }
+    }, 500);
+
+    runSelfTests();
+    window.addEventListener('pointerdown', ()=>ensureAudio(), {once:true});
+    window.addEventListener('storage', (e)=>{ if(e.key==='mag_tasks'){ tasks = loadState(); renderBoard(boardEl); renderTasks(); }});
+    bc && bc.addEventListener('message', ()=>{ tasks = loadState(); renderBoard(boardEl); renderTasks(); });
+  }
+
+  function wireHeader(){
+    document.getElementById('clearBtn').addEventListener('click', ()=>{
+      if(confirm('Clear all tasks? This only affects your local browser.')){
+        tasks = []; persist(); alarmingTaskIds.clear(); renderBoard(boardEl); renderTasks(); notify('All tasks cleared.'); ping();
+      }
+    });
+    document.getElementById('monitorBtn').addEventListener('click', openMonitor);
+    document.getElementById('adminBtn').addEventListener('click', openAdmin);
+    document.getElementById('search').addEventListener('input', renderTasks);
+    document.getElementById('filterPrio').addEventListener('change', renderTasks);
+  }
+
+  function ensureAdminFruitSizes() {
+    // Ensure only admin fruits on main screen have medium size until priority is set
+    fruits.forEach(fruit => {
+      if(fruit.adminOnly && !fruit.prioritySet) {
+        fruit.size = 'md'; // Set to medium size until priority is assigned
+      }
+    });
+  }
+
+  function adjustBasketLayout(container, fruitCount){
+    // Responsive grid: 2 columns on small screens, 3 for 5+ fruits
+    const isPhone = window.matchMedia('(max-width: 600px)').matches;
+    if(isPhone){
+      container.style.display = 'grid';
+      const cols = fruitCount >= 5 ? 3 : 2;
+      container.style.gridTemplateColumns = `repeat(${cols}, auto)`;
+      container.style.placeItems = 'center';
+      container.style.placeContent = 'center';
+      // Dynamic board height to fit rows
+      const rows = Math.ceil(fruitCount / cols);
+      const baseHeight = 260; // base for 1-2 fruits
+      const perRow = 150;     // extra per additional row
+      container.style.minHeight = `${baseHeight + Math.max(0, rows-1)*perRow}px`;
+      container.style.gap = fruitCount <= 2 ? '18px' : '16px';
+    } else {
+      // Desktop uses flex centering
+      container.style.display = 'flex';
+      container.style.flexWrap = 'wrap';
+      container.style.justifyContent = 'center';
+      container.style.alignItems = 'center';
+      container.style.alignContent = 'center';
+      container.style.gap = fruitCount <= 2 ? '50px' : fruitCount === 3 ? '35px' : fruitCount === 4 ? '28px' : fruitCount === 5 ? '24px' : '20px';
+      container.style.minHeight = '320px';
+    }
+  }
+
+  function magicalReturnFruit(fruitId, cardElement){
+    // Start the magical animation
+    cardElement.classList.add('returning');
+    
+    // Create magical particles effect
+    createMagicalParticles(cardElement);
+    
+    // Play magical sound (if audio context is available)
+    playMagicalSound();
+    
+    // Wait for animation to complete, then return fruit
+    setTimeout(() => {
+      returnFruitToAdmin(fruitId);
+    }, 800); // Match animation duration
+  }
+  
+  function createMagicalParticles(element){
+    const rect = element.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    // Create 8 magical particles
+    for(let i = 0; i < 8; i++) {
+      const particle = document.createElement('div');
+      particle.style.cssText = `
+        position: fixed;
+        left: ${centerX}px;
+        top: ${centerY}px;
+        width: 6px;
+        height: 6px;
+        background: #6ee7ff;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        animation: particleFloat 1.2s ease-out forwards;
+        animation-delay: ${i * 0.1}s;
+      `;
+      
+      // Add particle animation
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes particleFloat {
+          0% {
+            transform: translate(0, 0) scale(1);
+            opacity: 1;
+            box-shadow: 0 0 10px #6ee7ff;
+          }
+          50% {
+            transform: translate(${(Math.random() - 0.5) * 100}px, ${(Math.random() - 0.5) * 100}px) scale(1.5);
+            opacity: 0.8;
+            box-shadow: 0 0 20px #6ee7ff;
+          }
+          100% {
+            transform: translate(${(Math.random() - 0.5) * 200}px, ${(Math.random() - 0.5) * 200}px) scale(0);
+            opacity: 0;
+            box-shadow: 0 0 30px #6ee7ff;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      document.body.appendChild(particle);
+      
+      // Remove particle after animation
+      setTimeout(() => {
+        particle.remove();
+        style.remove();
+      }, 1500);
+    }
+  }
+  
+  function playMagicalSound(){
+    try {
+      const audioCtx = ensureAudio();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.5);
+      
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+      
+      oscillator.start(audioCtx.currentTime);
+      oscillator.stop(audioCtx.currentTime + 0.5);
+    } catch(e) {
+      // Audio not available, continue silently
+    }
+  }
+
+  function returnFruitToAdmin(fruitId){
+    const fruitIndex = fruits.findIndex(f => f.id === fruitId);
+    if(fruitIndex !== -1) {
+      const fruit = fruits[fruitIndex];
+      
+      // Stop any alarms for tasks associated with this fruit
+      const activeTasks = tasks.filter(t => t.fruitId === fruitId && t.status !== 'done');
+      activeTasks.forEach(task => {
+        stopAlarm(task.id);
+        // Mark the task as done since the fruit is being returned
+        task.status = 'done';
+        task.completedBy = 'Returned to Admin';
+      });
+      
+      // Additional cleanup to ensure no alarms persist
+      try {
+        // Clear any stored alarm state for this fruit
+        localStorage.removeItem(`mag_alarm_${fruitId}`);
+      } catch(e) {}
+      
+      // Restore original admin fruit properties based on fruit type
+      if(fruit.id === 'apple') {
+        fruit.preset = 'High';
+        fruit.size = 'lg';
+      } else if(fruit.id === 'banana') {
+        fruit.preset = 'Medium';
+        fruit.size = 'md';
+      } else if(fruit.id === 'strawberry') {
+        fruit.preset = 'Low';
+        fruit.size = 'sm';
+      }
+      fruit.prioritySet = false; // Reset priority flag
+      
+      // Move fruit back to admin fruits
+      fruits.splice(fruitIndex, 1);
+      adminFruits.push(fruit);
+      
+      // Re-render both sections
+      renderBoard(boardEl);
+      renderExtraTasks();
+      persist();
+      ping();
+      
+      notify(`✨ ${fruit.name} back to admin page! ✨`);
+    }
+  }
+
+  function renderBoard(container){
+    if(!container) return;
+    container.innerHTML = '';
+    let i=0;
+    
+    // Show only main fruits (admin fruits are moved here when clicked)
+    fruits.forEach(f=>{
+      const card = ce('div');
+      card.className = 'fruit';
+      if (fruitActive(f.id)) card.classList.add('out');
+      card.dataset.size = f.size;
+      card.style.zIndex = String(10+i);
+      
+      // Check if this fruit was originally an admin fruit
+      const isAdminFruit = f.adminOnly;
+      
+      card.innerHTML = `
+        <div class="emoji">${f.emoji}</div>
+        <div class="name">${f.name}</div>
+        ${fruitActive(f.id)?'<div class="badge">OUT</div>':''}
+      `;
+      
+      card.title = fruitActive(f.id) ? 'This fruit is out on a task' : 'Assign a task';
+      
+      if(!fruitActive(f.id)) {
+        if(isAdminFruit) {
+          // Add admin fruit visual indicator and double-click functionality
+          card.classList.add('returnable', 'admin-fruit');
+          card.title = `Double-click ${f.name} to return to admin panel 🔙`;
+          
+          let clickCount = 0;
+          let clickTimer = null;
+          
+          card.addEventListener('click', (e)=>{
+            clickCount++;
+            if(clickCount === 1) {
+              clickTimer = setTimeout(() => {
+                // Single click - assign task
+                openAssignModal(f);
+                clickCount = 0;
+              }, 300);
+            } else if(clickCount === 2) {
+              // Double click - return to admin
+              clearTimeout(clickTimer);
+              clickCount = 0;
+              magicalReturnFruit(f.id, card);
+            }
+          });
+        } else {
+          // For regular fruits, just assign
+          card.addEventListener('click', ()=>openAssignModal(f));
+        }
+      }
+      
+      container.appendChild(card);
+      i++;
+    });
+    
+    // Adjust layout based on number of fruits
+    adjustBasketLayout(container, fruits.length);
+  }
+
+  const modal = document.getElementById('modal');
+  const mFruit = document.getElementById('mFruit');
+  mUser = document.getElementById('mUser');
+  const mPriority = document.getElementById('mPriority');
+  const mTask = document.getElementById('mTask');
+  const mDate = document.getElementById('mDate'); const openCalBtn = document.getElementById('openCal');
+  const mTime = document.getElementById('mTime');
+  const mDueIn = document.getElementById('mDueIn');
+  const saveBtn = document.getElementById('saveBtn');
+  const cancelBtn = document.getElementById('cancelBtn');
+
+  let currentFruit = null;
+
+  function isValidDateStr(v){ if(!v) return false; const p=v.split('-'); if(p.length!==3) return false; const d=new Date(v); return !isNaN(d.getTime()); }
+  function isValidTimeStr(v){ if(!v) return false; const p=v.split(':'); if(p.length<2) return false; const hh=+p[0], mm=+p[1]; return Number.isInteger(hh)&&Number.isInteger(mm)&&hh>=0&&hh<24&&mm>=0&&mm<60; }
+
+  function openAssignModal(f){
+    currentFruit = f;
+    if(mUser){ mUser.value = localStorage.getItem('magnet_user') || ''; }
+    mFruit.value = `${f.emoji} ${f.name}`;
+    
+    // Check if this is a main fruit (has preset) or admin fruit
+    const isMainFruit = f.preset && !f.adminOnly;
+    
+    if(isMainFruit) {
+      // For main fruits, show priority as read-only text
+      mPriority.style.display = 'none';
+      const priorityLabel = mPriority.previousElementSibling;
+      priorityLabel.innerHTML = `Priority: <strong>${f.preset}</strong>`;
+      priorityLabel.style.color = '#6ee7ff';
+      priorityLabel.style.fontWeight = 'bold';
+    } else {
+      // For admin fruits, show dropdown
+      mPriority.style.display = 'block';
+      const priorityLabel = mPriority.previousElementSibling;
+      priorityLabel.innerHTML = 'Priority (preset)';
+      priorityLabel.style.color = '#a9b3c9';
+      priorityLabel.style.fontWeight = 'normal';
+      mPriority.value = f.preset || '';
+    }
+    
+    mTask.value=''; mDate.value=''; mTime.value=''; mDueIn.value='';
+    const today = new Date(); const yyyy=today.getFullYear(); const mm=String(today.getMonth()+1).padStart(2,'0'); const dd=String(today.getDate()).padStart(2,'0');
+    // Remove date restriction to allow any date
+    // if(mDate){ mDate.min = `${yyyy}-${mm}-${dd}`; }
+    if(mTime){ mTime.step = 60; }
+    
+    modal.showModal();
+    setTimeout(()=>{ mTask?.focus(); }, 30);
+  }
+
+  cancelBtn.addEventListener('click', ()=>{ try{ modal.close(); }catch(e){} modal.removeAttribute('open'); });
+  modal.addEventListener('click', (e)=>{
+    const box = modal.querySelector('.modal')?.getBoundingClientRect(); if(!box) return;
+    if(e.clientX < box.left || e.clientX > box.right || e.clientY < box.top || e.clientY > box.bottom){
+      try{ modal.close(); }catch(_){} modal.removeAttribute('open');
+    }
+  });
+
+  openCalBtn.addEventListener('click', ()=> safeOpenDatePicker(mDate));
+
+  function computeDue(){
+    if(mDueIn.value){
+      const mins = parseInt(mDueIn.value,10);
+      return new Date(Date.now() + mins*60*1000).toISOString();
+    }
+    if(mDate.value && mTime.value){
+      // Create date in local timezone to avoid timezone conversion issues
+      const [year, month, day] = mDate.value.split('-').map(Number);
+      const [hours, minutes] = mTime.value.split(':').map(Number);
+      const localDate = new Date(year, month - 1, day, hours, minutes, 0);
+      return localDate.toISOString();
+    }
+    return new Date(Date.now()+15*60*1000).toISOString();
+  }
+
+  function safeOpenDatePicker(input){
+    if(!input) return false;
+    try{
+      if(typeof input.showPicker === 'function'){ input.showPicker(); return true; }
+    }catch(err){ console.warn('showPicker blocked; fallback', err); }
+    try{ input.focus(); input.click(); return true; }catch(e){ return false; }
+  }
+
+  function safeUUID() {
+    try { if (crypto && typeof crypto.randomUUID === 'function') return crypto.randomUUID(); } catch (_) {}
+    try {
+      const a = new Uint8Array(16);
+      (crypto && crypto.getRandomValues) ? crypto.getRandomValues(a) :
+        Array.from({length:16}, (_,i)=>a[i]=Math.random()*256|0);
+      a[6] = (a[6] & 0x0f) | 0x40; a[8] = (a[8] & 0x3f) | 0x80;
+      const hex = [...a].map(x=>x.toString(16).padStart(2,'0')).join('');
+      return `${hex.substr(0,8)}-${hex.substr(8,4)}-${hex.substr(12,4)}-${hex.substr(16,4)}-${hex.substr(20)}`;
+    } catch (_) {
+      return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
+    }
+  }
+
+  saveBtn.addEventListener('click', ()=>{
+    let createdOk = false;
+    try {
+      const desc = mTask.value.trim();
+      if(!desc){ notify('Please enter a task description.'); return; }
+      if(!mDueIn.value && !(mDate.value && mTime.value)){ notify('Please set a due date & time, or choose "due in".'); return; }
+      if(!mDueIn.value){
+        if(!isValidDateStr(mDate.value) || !isValidTimeStr(mTime.value)) { notify('Please enter a real date & time.'); return; }
+        // Create date in local timezone to avoid timezone conversion issues
+        const [year, month, day] = mDate.value.split('-').map(Number);
+        const [hours, minutes] = mTime.value.split(':').map(Number);
+        const tmp = new Date(year, month - 1, day, hours, minutes, 0);
+        if(isNaN(tmp.getTime())) { notify('Invalid date/time.'); return; }
+        // Allow any date - removed future date restriction
+        // if(tmp.getTime() < Date.now()) { notify('Due time must be in the future.'); return; }
+      }
+
+      const dueISO = computeDue();
+      const id = safeUUID();
+      const assignee = (mUser?.value || localStorage.getItem('magnet_user') || '').trim() || 'Someone';
+      if(mUser && mUser.value.trim()){ localStorage.setItem('magnet_user', mUser.value.trim()); }
+      
+      // Get priority - for main fruits use preset, for admin fruits use dropdown value
+      const isMainFruit = currentFruit?.preset && !currentFruit?.adminOnly;
+      const prio = isMainFruit ? currentFruit.preset : (mPriority.value || null);
+      
+      // Update fruit size based on priority for admin fruits (only when priority is explicitly set)
+      if(!isMainFruit && prio && prio !== '' && prio !== 'none') {
+        if(prio === 'High') currentFruit.size = 'lg';
+        else if(prio === 'Medium') currentFruit.size = 'md';
+        else if(prio === 'Low') currentFruit.size = 'sm';
+        currentFruit.prioritySet = true; // Mark that priority was explicitly set
+      }
+
+      tasks.push({ id, fruitId: currentFruit.id, task: desc, due: dueISO, prio, createdBy: assignee, status:'active', completedBy:null, createdAt: new Date().toISOString() });
+      persist(); ping();
+      renderBoard(boardEl); renderTasks();
+      addLog(`${emojiFor(currentFruit.id)} <b>${desc}</b> assigned to <b>${assignee}</b>${prio?` · <b>${prio} priority</b>`:''}, due <b>${fmtDate(dueISO)}</b> at <b>${fmtTime(dueISO)}</b>.`);
+      notify(`Task assigned on ${currentFruit.name}.`);
+      createdOk = true;
+    } catch (err) {
+      console.error('Assign failed:', err);
+      notify('Something went wrong while assigning. Dialog will close; please try again.');
+    } finally {
+      try { modal.close(); } catch(_) {}
+      modal.removeAttribute('open');
+      if (createdOk) { mTask.value=''; mDate.value=''; mTime.value=''; mDueIn.value=''; }
+    }
+  });
+
+  function renderTasks(){
+    rowsEl.innerHTML='';
+    const term = (searchEl?.value||'').toLowerCase();
+    const prioFilter = filterPrioEl?.value || 'all';
+
+    tasks
+      .filter(t=>t.status!=='done')
+      .filter(t=>{
+        const f = fruitById(t.fruitId);
+        const matchesText = !term || t.task.toLowerCase().includes(term) || f.name.toLowerCase().includes(term);
+        const matchesPrio = prioFilter==='all' || (prioFilter==='none' ? !t.prio : t.prio===prioFilter);
+        return matchesText && matchesPrio;
+      })
+      .sort((a,b)=>{
+        // First sort by priority (High > Medium > Low > none)
+        const priorityOrder = { 'High': 3, 'Medium': 2, 'Low': 1, '': 0 };
+        const aPrio = priorityOrder[a.prio] || 0;
+        const bPrio = priorityOrder[b.prio] || 0;
+        
+        if(aPrio !== bPrio) {
+          return bPrio - aPrio; // Higher priority first
+        }
+        
+        // If same priority, sort by due date
+        return new Date(a.due) - new Date(b.due);
+      })
+      .forEach(t=>{
+        const f = fruitById(t.fruitId);
+        const row = ce('div'); row.className='row'; row.dataset.id=t.id;
+        const dot = ce('div'); dot.className='dot';
+        const fruitCol = ce('div'); fruitCol.className='fruitCol'; 
+        const priorityClass = t.prio ? `priority-${t.prio.toLowerCase()}` : '';
+        fruitCol.innerHTML=`<span class="emoji">${f.emoji}</span><span class="task">${t.task}</span>${t.prio?` <span class="pill priority-pill ${priorityClass}">${t.prio}</span>`:''}`;
+        const dateCol = ce('div'); dateCol.innerHTML = `<span class="pill">Date: <b>${fmtDate(t.due)}</b></span>`;
+        const timeCol = ce('div'); timeCol.innerHTML = `<span class="pill">Time: <b>${fmtTime(t.due)}</b></span>`;
+        const leftCol = ce('div'); leftCol.innerHTML = `<span class="pill" data-left>—</span>`;
+
+        const actions = ce('div'); actions.className='actions';
+        const btnDone = ce('button'); btnDone.className='primary'; btnDone.innerHTML='Return to Basket ✅'; btnDone.addEventListener('click', ()=>completeTask(t.id));
+        
+        // Only show snooze and cancel buttons in admin mode
+        if(isAdminMode) {
+          const btnSnooze = ce('button'); btnSnooze.title='Snooze 5 minutes'; btnSnooze.innerText='Snooze 5m'; btnSnooze.addEventListener('click', ()=>snoozeTask(t.id, 5));
+          const btnSkip = ce('button'); btnSkip.title='Cancel task'; btnSkip.innerText='Cancel'; btnSkip.addEventListener('click', ()=>cancelTask(t.id));
+          actions.append(btnDone, btnSnooze, btnSkip);
+        } else {
+          actions.append(btnDone);
+        }
+
+        row.append(dot, fruitCol, dateCol, timeCol, leftCol, actions);
+        rowsEl.appendChild(row);
+        updateCountdown(row, t);
+      });
+  }
+
+  function updateCountdown(row, t){
+    const leftEl = row.querySelector('[data-left]');
+    const now = Date.now();
+    const due = new Date(t.due).getTime();
+    const diff = due - now;
+    if(diff <= 0){ row.classList.add('overdue','shake'); if(leftEl) leftEl.textContent = 'OVERDUE'; triggerAlarm(t.id); }
+    else { const m = Math.floor(diff/60000); const s = Math.floor((diff%60000)/1000); if(leftEl) leftEl.textContent = `${m}m ${s}s`; }
+  }
+
+  setInterval(()=>{
+    document.querySelectorAll('.row').forEach(row=>{
+      const id = row.dataset.id; const t = tasks.find(x=>x.id===id);
+      if(!t || t.status==='done') return;
+      updateCountdown(row,t);
+    });
+  }, 1000);
+
+  function completeTask(id){
+    const t = tasks.find(x=>x.id===id); if(!t) return;
+    t.status='done';
+    t.completedBy = (localStorage.getItem('magnet_user') || (mUser?.value||'')).trim() || 'Someone';
+    t.completedAt = new Date().toISOString();
+    persist(); stopAlarm(id); renderBoard(boardEl); renderTasks(); ping();
+    addLog(`${emojiFor(t.fruitId)} <b>${t.task}</b> completed by <b>${t.completedBy}</b> at <b>${fmtDate(t.completedAt)}</b> <b>${fmtTime(t.completedAt)}</b>.`);
+    notify('Task completed. Alarm off.');
+  }
+
+  function cancelTask(id){
+    const t = tasks.find(x=>x.id===id); if(!t) return;
+    t.status='done';
+    t.completedBy = (((localStorage.getItem('magnet_user') || (mUser?.value||''))).trim()||'Someone') + ' (cancelled)';
+    t.completedAt = new Date().toISOString();
+    persist(); stopAlarm(id); renderBoard(boardEl); renderTasks(); ping();
+    addLog(`${emojiFor(t.fruitId)} <b>${t.task}</b> cancelled by <b>${t.completedBy}</b> at <b>${fmtDate(t.completedAt)}</b> <b>${fmtTime(t.completedAt)}</b>.`);
+    notify('Task cancelled.');
+  }
+
+  function snoozeTask(id, minutes=5){
+    const t = tasks.find(x=>x.id===id); if(!t) return;
+    const newDue = new Date(Date.now()+minutes*60000);
+    t.due = newDue.toISOString();
+    persist(); stopAlarm(id); renderTasks(); ping();
+    addLog(`${emojiFor(t.fruitId)} <b>${t.task}</b> snoozed for ${minutes}m. New due: <b>${fmtDate(t.due)}</b> <b>${fmtTime(t.due)}</b>.`);
+    notify(`Snoozed ${minutes}m.`);
+  }
+
+  const adminDlg = document.getElementById('adminDialog');
+  const adminLogin = document.getElementById('adminLogin');
+  const adminPanel = document.getElementById('adminPanel');
+  const forceSelect = document.getElementById('forceSelect');
+
+  function openAdmin(){ 
+    adminDlg.showModal(); 
+    refreshForceSelect(); 
+    // Reset admin panel to welcome state every time
+    adminLogin.style.display='block'; 
+    adminPanel.style.display='none';
+  }
+
+  function renderExtraTasks(){
+    const grid = document.getElementById('extraTasksGrid');
+    if(!grid) return;
+    grid.innerHTML = '';
+    
+    // Show only admin fruits as extra tasks
+    adminFruits.forEach(fruit => {
+      const isActive = fruitActive(fruit.id);
+      const taskEl = ce('div');
+      taskEl.className = 'extra-task-item';
+      taskEl.innerHTML = `
+        <div class="emoji">${fruit.emoji}</div>
+        <div class="name">${fruit.name}</div>
+        ${isActive ? '<div class="status">OUT</div>' : ''}
+      `;
+      taskEl.title = `${fruit.name} - ${fruit.preset} priority ${isActive ? '(Currently assigned)' : '(Click to add to main page)'}`;
+      
+      if(!isActive) {
+        taskEl.addEventListener('click', () => {
+          // Show confirmation popup
+          if(confirm(`Add ${fruit.name} to the main page?`)) {
+            // Move fruit from adminFruits to fruits
+            const fruitIndex = adminFruits.findIndex(f => f.id === fruit.id);
+            if(fruitIndex !== -1) {
+              const movedFruit = adminFruits.splice(fruitIndex, 1)[0];
+              // Remove preset priority and set to normal size until priority is assigned
+              movedFruit.preset = '';
+              movedFruit.size = 'md'; // Set to medium size until priority is assigned
+              movedFruit.prioritySet = false; // Flag to track if priority was explicitly set
+              fruits.push(movedFruit);
+              
+              // Re-render both sections
+              renderExtraTasks();
+              renderBoard(boardEl);
+              persist();
+              ping();
+              
+              notify(`${fruit.name} added to main page!`);
+            }
+          }
+        });
+      } else {
+        taskEl.style.opacity = '0.6';
+        taskEl.style.cursor = 'not-allowed';
+      }
+      
+      grid.appendChild(taskEl);
+    });
+  }
+
+  function renderActivityStats(){
+    const statsEl = document.getElementById('activityStats');
+    if(!statsEl) return;
+    
+    const activeTasks = tasks.filter(t => t.status !== 'done').length;
+    const overdueTasks = tasks.filter(t => t.status !== 'done' && new Date(t.due).getTime() <= Date.now()).length;
+    const completedToday = tasks.filter(t => t.status === 'done' && new Date(t.completedAt).toDateString() === new Date().toDateString()).length;
+    const totalFruits = fruits.length + adminFruits.length; // Count all fruits
+    
+    statsEl.innerHTML = `
+      <div class="stat-item">
+        <div class="stat-number">${activeTasks}</div>
+        <div class="stat-label">Active Tasks</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">${overdueTasks}</div>
+        <div class="stat-label">Overdue</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">${completedToday}</div>
+        <div class="stat-label">Completed Today</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">${totalFruits}</div>
+        <div class="stat-label">Total Fruits</div>
+      </div>
+    `;
+  }
+
+  function renderAdminActivityLog(){
+    const adminLogEl = document.getElementById('adminLog');
+    if(!adminLogEl) return;
+    adminLogEl.innerHTML = '';
+    
+    // Show recent log items
+    const logItems = Array.from(document.querySelectorAll('.logItem')).slice(0, 10);
+    logItems.forEach(item => {
+      const clone = item.cloneNode(true);
+      adminLogEl.appendChild(clone);
+    });
+  }
+  document.getElementById('adminClose').addEventListener('click', ()=>{ 
+    try{adminDlg.close()}catch(_){}
+    isAdminMode = false;
+    renderTasks(); // Re-render to hide admin buttons
+  });
+
+  // Info button and modal
+  const infoBtn = document.getElementById('infoBtn');
+  const infoDialog = document.getElementById('infoDialog');
+  const infoClose = document.getElementById('infoClose');
+  
+  if(infoBtn) {
+    infoBtn.addEventListener('click', ()=> {
+      try { infoDialog.showModal(); } catch(_) {}
+    });
+  }
+  
+  if(infoClose) {
+    infoClose.addEventListener('click', ()=> {
+      try { infoDialog.close(); } catch(_) {}
+    });
+  }
+
+  document.getElementById('adminLoginBtn').addEventListener('click', ()=>{
+    adminLogin.style.display='none'; 
+    adminPanel.style.display='grid';
+    isAdminMode = true;
+    // Render admin features
+    renderExtraTasks();
+    renderActivityStats();
+    renderAdminActivityLog();
+    // Re-render tasks to show admin buttons
+    renderTasks();
+    notify('Welcome to Admin Mode! 🎯');
+  });
+
+  // Toggle activity log visibility
+  document.getElementById('toggleActivityLog').addEventListener('click', ()=>{
+    const logDiv = document.getElementById('adminActivityLog');
+    const toggleBtn = document.getElementById('toggleActivityLog');
+    if(logDiv.style.display === 'none'){
+      logDiv.style.display = 'block';
+      toggleBtn.textContent = 'Hide Detailed Log';
+    } else {
+      logDiv.style.display = 'none';
+      toggleBtn.textContent = 'Show Detailed Log';
+    }
+  });
+
+  // Refresh stats
+  document.getElementById('refreshStats').addEventListener('click', ()=>{
+    renderActivityStats();
+    renderExtraTasks();
+    renderAdminActivityLog();
+    notify('Stats refreshed');
+  });
+
+  // Bulk complete overdue tasks
+  document.getElementById('bulkComplete').addEventListener('click', ()=>{
+    const overdueTasks = tasks.filter(t => t.status !== 'done' && new Date(t.due).getTime() <= Date.now());
+    if(overdueTasks.length === 0) {
+      notify('No overdue tasks to complete');
+      return;
+    }
+    if(confirm(`Complete ${overdueTasks.length} overdue tasks?`)) {
+      overdueTasks.forEach(task => completeTask(task.id));
+      notify(`Completed ${overdueTasks.length} overdue tasks`);
+    }
+  });
+
+  // Extend all tasks by 1 hour
+  document.getElementById('extendAllTasks').addEventListener('click', ()=>{
+    const activeTasks = tasks.filter(t => t.status !== 'done');
+    if(activeTasks.length === 0) {
+      notify('No active tasks to extend');
+      return;
+    }
+    if(confirm(`Extend ${activeTasks.length} active tasks by 1 hour?`)) {
+      activeTasks.forEach(task => {
+        const newDue = new Date(new Date(task.due).getTime() + 60*60*1000);
+        task.due = newDue.toISOString();
+      });
+      persist(); renderTasks(); ping();
+      notify(`Extended ${activeTasks.length} tasks by 1 hour`);
+    }
+  });
+
+
+  document.getElementById('adminSilence').addEventListener('click', ()=>{
+    // Comprehensive alarm stopping
+    alarmingTaskIds.clear();
+    
+    // Stop all audio contexts
+    try {
+      if(audioCtx) {
+        audioCtx.close();
+        audioCtx = null;
+      }
+    } catch(e) {}
+    
+    // Clear any stored alarm data
+    try {
+      localStorage.removeItem('mag_alarm_state');
+      localStorage.removeItem('mag_alarming_tasks');
+      // Clear any fruit-specific alarm data
+      ['apple', 'banana', 'strawberry', 'pineapple', 'orange', 'grapes'].forEach(fruitId => {
+        localStorage.removeItem(`mag_alarm_${fruitId}`);
+      });
+    } catch(e) {}
+    
+    notify('🔇 All alarms silenced (admin).');
+  });
+
+  function refreshForceSelect(){
+    forceSelect.innerHTML='';
+    tasks.filter(t=>t.status!=='done').forEach(t=>{
+      const f = fruitById(t.fruitId);
+      const opt = ce('option'); opt.value = t.id; opt.textContent = `${f.name} – ${t.task} (due ${fmtTime(t.due)})`;
+      forceSelect.appendChild(opt);
+    });
+  }
+
+  document.getElementById('forceReturn').addEventListener('click', ()=>{
+    const id = forceSelect.value; if(!id) return;
+    completeTask(id);
+    refreshForceSelect();
+  });
+
+
+  let monitorWin = null;
+  function openMonitor(){
+    monitorWin = window.open('', 'magnetMonitor', 'width=560,height=680');
+    if(!monitorWin) { notify('Pop-up blocked. Allow pop-ups for this site.'); return; }
+    monitorWin.document.write(`
+      <html><head><meta charset="utf-8"><title>Magnet Monitor</title>
+      <style>
+        :root{ --bg:#0a0f1e; --panel:#12162a; --accent:#a78bfa; --text:#eaf1ff; --muted:#9aa3b8; }
+        *{box-sizing:border-box}
+        body{margin:0;background:radial-gradient(120% 100% at 50% -10%, #0b1230, var(--bg) 45%, #0a0918 100%);color:var(--text);font-family:Inter,system-ui;display:flex;flex-direction:column;min-height:100vh}
+        header{padding:14px 18px;border-bottom:1px solid rgba(167,139,250,.25);background:rgba(16,12,28,.9);backdrop-filter:blur(8px);position:sticky;top:0}
+        h3{margin:0;font-size:17px; text-align:center}
+        .list{padding:14px;display:grid;grid-template-columns:1fr;gap:10px;max-width:720px;margin:12px auto 18px}
+        .row{display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(167,139,250,.25);background:linear-gradient(180deg,#14122a,#0e0b1f);border-radius:12px;padding:12px 14px;box-shadow:0 6px 18px rgba(0,0,0,.28)}
+        .over{border-color:#5b1b1b;background:linear-gradient(180deg,#1a1218,#120c12)}
+        .pill{font-size:12px;padding:5px 10px;border:1px solid rgba(167,139,250,.35);border-radius:999px;background:rgba(167,139,250,.12);color:var(--accent)}
+        @media (max-width:520px){ .row{flex-direction:column;align-items:flex-start;gap:6px} .pill{align-self:flex-end} }
+      </style></head>
+      <body><header><h3>Monitor — Fruits not returned</h3></header><div id="list" class="list"></div>
+      <script>
+        function fmtDateTime(iso){ const d = new Date(iso); return d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + ' · ' + d.toLocaleDateString([], {day:'2-digit', month:'short'}); }
+        function render(){
+          const list = document.getElementById('list'); list.innerHTML='';
+          const tasks = JSON.parse(localStorage.getItem('mag_tasks')||'[]').filter(t=>t.status!=='done');
+          tasks.sort((a,b)=>new Date(a.due)-new Date(b.due)).forEach(t=>{
+            const div=document.createElement('div'); const overdue = (new Date(t.due).getTime()-Date.now())<=0;
+            div.className='row'+(overdue?' over':'');
+            const name = t.fruitId.charAt(0).toUpperCase()+t.fruitId.slice(1);
+            div.innerHTML = '<div>'+name+' — '+t.task+'</div><div class="pill">'+(overdue?'OVERDUE':'Due '+fmtDateTime(t.due))+'</div>';
+            list.appendChild(div);
+          });
+        }
+        window.addEventListener('storage', render);
+        setInterval(render, 1000);
+        render();
+      <\/script></body></html>`);  <!-- NOTE: escaped closing script -->
+    monitorWin.document.close();
+  }
+
+  function notify(msg){
+    const t = ce('div'); t.className='t'; t.innerHTML=msg; toastEl.appendChild(t);
+    setTimeout(()=>{t.style.opacity='0'; t.style.transform='translateY(6px)';}, 2200);
+    setTimeout(()=>t.remove(), 2600);
+  }
+  function addLog(html){
+    const li = ce('div'); li.className='logItem'; li.innerHTML = `${timeStamp()} · ${html}`; logEl.prepend(li);
+  }
+
+  let audioCtx = null;
+  function ensureAudio(){
+    if(audioCtx){ if(audioCtx.state==='suspended'){ audioCtx.resume().catch(()=>{}); } return audioCtx; }
+    audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    // Proactively resume on user gestures (needed on iOS Safari)
+    const resume = ()=>{ try{ audioCtx && audioCtx.resume(); }catch(_){} };
+    window.addEventListener('touchstart', resume, {once:true, passive:true});
+    window.addEventListener('pointerdown', resume, {once:true});
+    window.addEventListener('click', resume, {once:true});
+    document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') resume(); });
+    return audioCtx;
+  }
+  function triggerAlarm(taskId){
+    if(alarmingTaskIds.has(taskId)) return;
+    alarmingTaskIds.add(taskId);
+    const ctx = ensureAudio();
+    if(ctx && ctx.state==='suspended'){ ctx.resume().catch(()=>{}); }
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+    const loop = ()=>{
+      if(!alarmingTaskIds.has(taskId)) return;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type='square'; o.frequency.value = 640;
+      const startTime = ctx.currentTime;
+      g.gain.setValueAtTime(.001, startTime);
+      const target = isIOS ? 0.6 : 0.3; // boost volume on iOS where output is quieter
+      g.gain.exponentialRampToValueAtTime(target, startTime+0.03);
+      o.connect(g).connect(ctx.destination);
+      o.start();
+      setTimeout(()=>{
+        o.stop();
+        if(alarmingTaskIds.has(taskId)) setTimeout(loop, 400);
+      }, 600);
+    };
+    loop();
+  }
+  function stopAlarm(taskId){ alarmingTaskIds.delete(taskId); }
+
+  function fmtDate(iso){ 
+    const d = new Date(iso); 
+    if(isNaN(d.getTime())) return 'Invalid Date';
+    return d.toLocaleDateString('en-US', {day:'2-digit', month:'short', year:'numeric'}); 
+  }
+  function fmtTime(iso){ 
+    const d = new Date(iso); 
+    if(isNaN(d.getTime())) return 'Invalid Time';
+    return d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'}); 
+  }
+  function timeStamp(){ const d = new Date(); return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}); }
+  function fruitById(id){ 
+    return fruits.find(f=>f.id===id) || adminFruits.find(f=>f.id===id) || {id,emoji:'🧩',name:id}; 
+  }
+  function emojiFor(fid){ return fruitById(fid)?.emoji || '🧩'; }
+  function persist(){ localStorage.setItem('mag_tasks', JSON.stringify(tasks)); localStorage.setItem('mag_fruits', JSON.stringify(fruits)); localStorage.setItem('mag_admin_fruits', JSON.stringify(adminFruits)); }
+  function loadState(){ 
+    try{ 
+      const t=JSON.parse(localStorage.getItem('mag_tasks'))||[]; 
+      const f=JSON.parse(localStorage.getItem('mag_fruits')); 
+      const af=JSON.parse(localStorage.getItem('mag_admin_fruits')); 
+      
+      // Only load fruits if they exist and are valid
+      if(f && Array.isArray(f) && f.length > 0) {
+        fruits = f;
+      }
+      // Otherwise keep the default fruits array
+      
+      if(af && Array.isArray(af)) {
+        adminFruits = af;
+      }
+      
+      return t;
+    }catch(e){ 
+      console.error('Error loading state:', e);
+      return [] 
+    } 
+  }
+  function ping(){ bc && bc.postMessage({type:'update'}); }
+
+  function runSelfTests(){
+    const results = []; const ok=(name,pass,extra='')=>results.push({name,pass,extra});
+    ok('DOM nodes exist', !!(boardEl&&rowsEl&&logEl&&toastEl));
+    renderBoard(boardEl); ok('Board renders fruits', document.querySelectorAll('.fruit').length === fruits.length);
+    try{ renderTasks(); ok('Render tasks safe', !!rowsEl); } catch(e){ ok('Render tasks safe', false, e.message); }
+    try{ const tmp=document.createElement('input'); tmp.type='date'; tmp.showPicker=()=>{ throw new DOMException('blocked','SecurityError'); }; safeOpenDatePicker(tmp); ok('safeOpenDatePicker ok', true); }catch(e){ ok('safeOpenDatePicker ok', false, e.message); }
+    const summary = results.map(r=>`${r.pass?'✅':'❌'} ${r.name}${r.extra?` (${r.extra})`:''}`).join(' • ');
+    addLog(`<b>Self-tests:</b> ${summary}`);
+  }
+  </script>
+</body>
+</html>

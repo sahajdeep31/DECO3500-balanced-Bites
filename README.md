@@ -121,3 +121,38 @@ The application is fully responsive and optimized for:
 - **Date/Time Handling**: Local timezone-aware scheduling
 - **Dynamic Layout**: Basket adjusts automatically based on fruit count
 
+## Quick Start Guide
+
+### For Teachers - 5 Simple Steps
+
+1. **Download the project:**
+   - Go to: https://github.com/sahajdeep31/DECO3500-balanced-Bites
+   - Click the green **"Code"** button
+   - Click **"Download ZIP"**
+
+2. **Extract the ZIP file:**
+   - Double-click the ZIP file to extract it
+   - You'll see a folder named `DECO3500-balanced-Bites`
+
+3. **Open Terminal in that folder:**
+   - **Mac**: Right-click the folder → "Open Terminal Here" or drag folder into Terminal
+   - **Windows**: Open Command Prompt in the folder (Shift + Right-click → "Open PowerShell window here")
+
+4. **Start the server:**
+   ```bash
+   python3 -m http.server 8000
+   ```
+   
+   *On Windows, use:*
+   ```bash
+   python -m http.server 8000
+   ```
+
+5. **Open in browser:**
+   - Go to: http://localhost:8000
+   - The application will load!
+
+**That's it!** Now you can start exploring the Magnet Tasks application.
+
+
+

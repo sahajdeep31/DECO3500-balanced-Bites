@@ -121,9 +121,9 @@ The application is fully responsive and optimized for:
 - **Date/Time Handling**: Local timezone-aware scheduling
 - **Dynamic Layout**: Basket adjusts automatically based on fruit count
 
+
 ## Quick Start Guide
 
-### For Teachers - 5 Simple Steps
 
 1. **Download the project:**
    - Go to: https://github.com/sahajdeep31/DECO3500-balanced-Bites
